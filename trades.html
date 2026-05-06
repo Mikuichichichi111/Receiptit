@@ -13,12 +13,12 @@
     <div class="bg-blob blob-3"></div>
 
     <nav class="navbar">
-        <div class="navbar-brand" onclick="window.location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
+        <div class="navbar-brand" onclick="location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
         <div class="navbar-actions">
-            <a href="inventory.html" class="navbar-link" title="Inventaire">🎒</a>
-            <a href="sticker-world.html" class="navbar-link" title="Sticker World">🌍</a>
-            <a href="friends.html" class="navbar-link" title="Amis">👥</a>
-            <a href="trades.html" class="navbar-link" title="Échanges" style="color:var(--accent);">🔄</a>
+            <a href="inventory.html" class="navbar-link">🎒</a>
+            <a href="sticker-world.html" class="navbar-link">🌍</a>
+            <a href="friends.html" class="navbar-link">👥</a>
+            <a href="trades.html" class="navbar-link" style="color:var(--accent);">🔄</a>
             <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
         </div>
     </nav>
@@ -26,19 +26,22 @@
     <div class="main-content">
         <div class="section-title">🔄 Échanges de stickers</div>
 
+        <!-- ENVOYER UN STICKER -->
         <div class="card">
             <h3>📤 Envoyer un sticker à un ami</h3>
-            <div class="input-group"><label>Destinataire</label><select id="trade-friend-select" style="width:100%;padding:12px;border-radius:12px;border:2px solid rgba(139,92,246,0.15);font-family:'Outfit',sans-serif;"></select></div>
-            <div class="input-group"><label>Sticker à envoyer</label><select id="trade-sticker-select" style="width:100%;padding:12px;border-radius:12px;border:2px solid rgba(139,92,246,0.15);font-family:'Outfit',sans-serif;"></select></div>
-            <div class="input-group"><label>Message (optionnel)</label><input type="text" id="trade-message" placeholder="Un petit mot..." maxlength="100"></div>
-            <button class="btn-primary" onclick="sendSticker()">🎁 Envoyer le sticker</button>
+            <div class="input-group"><label>Destinataire</label><select id="trade-friend"></select></div>
+            <div class="input-group"><label>Sticker</label><select id="trade-sticker"></select></div>
+            <div class="input-group"><label>Message</label><input type="text" id="trade-msg" placeholder="Un petit mot..." maxlength="100"></div>
+            <button class="btn-primary" onclick="sendSticker()">🎁 Envoyer</button>
         </div>
 
-        <div class="section-title">📬 Demandes reçues</div>
-        <div id="received-trades"><div class="empty-state"><p>Aucune demande.</p></div></div>
+        <!-- DEMANDES REÇUES -->
+        <div class="section-title">📩 Reçus (<span id="received-count">0</span>)</div>
+        <div id="received-trades"></div>
 
-        <div class="section-title">📤 Demandes envoyées</div>
-        <div id="sent-trades"><div class="empty-state"><p>Aucune demande.</p></div></div>
+        <!-- ENVOYÉS -->
+        <div class="section-title">📤 Envoyés (<span id="sent-count">0</span>)</div>
+        <div id="sent-trades"></div>
     </div>
 
     <nav class="bottom-nav">
@@ -51,113 +54,108 @@
 
     <div class="toast" id="toast"></div>
 
+    <script src="config.js"></script>
     <script>
         const currentUser = localStorage.getItem('receiptit_logged_user');
-        if (!currentUser) window.location.href = 'login.html';
+        if (!currentUser) location.href = 'login.html';
 
-        let state = { following: [], inventory: {}, points: 0 };
-        let trades = JSON.parse(localStorage.getItem('receiptit_trades') || '[]');
+        let myState = { points:0,inventory:{},friends:[] };
+        let trades = JSON.parse(localStorage.getItem('receiptit_trades')||'[]');
 
         function loadState() {
-            const s = localStorage.getItem('receiptit_state_' + currentUser);
-            if (s) try { state = { ...state, ...JSON.parse(s) }; } catch(e) {}
+            const s = localStorage.getItem('receiptit_state_'+currentUser);
+            if (s) try { myState = {...myState,...JSON.parse(s)}; } catch(e) {}
+        }
+
+        function saveState() {
+            localStorage.setItem('receiptit_state_'+currentUser, JSON.stringify({...JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}'), inventory:myState.inventory}));
         }
 
         function saveTrades() { localStorage.setItem('receiptit_trades', JSON.stringify(trades)); }
 
         function populateSelects() {
-            const friendSelect = document.getElementById('trade-friend-select');
-            friendSelect.innerHTML = (state.following || []).map(f => `<option value="${f}">@${f}</option>`).join('') || '<option>Aucun ami</option>';
+            const friends = myState.friends||[];
+            document.getElementById('trade-friend').innerHTML = friends.length ? friends.map(f => `<option value="${f}">@${f}</option>`).join('') : '<option>Aucun ami</option>';
 
-            const stickerSelect = document.getElementById('trade-sticker-select');
-            const items = Object.entries(state.inventory).map(([k,v]) => ({key:k, ...v}));
-            stickerSelect.innerHTML = items.length ? items.map(i => `<option value="${i.key.replace(/"/g,'&quot;')}">${i.icon} ${i.name} (x${i.count})</option>`).join('') : '<option>Pas de sticker</option>';
+            const items = Object.entries(myState.inventory).map(([k,v]) => ({key:k,...v}));
+            document.getElementById('trade-sticker').innerHTML = items.length ? items.map(i => `<option value="${i.key.replace(/"/g,'&quot;')}">${i.i||i.icon} ${i.n||i.name} (x${i.count})</option>`).join('') : '<option>Pas de sticker</option>';
         }
 
         function sendSticker() {
-            const to = document.getElementById('trade-friend-select').value;
-            const stickerKey = document.getElementById('trade-sticker-select').value;
-            const msg = document.getElementById('trade-message').value.trim();
-
+            const to = document.getElementById('trade-friend').value;
+            const key = document.getElementById('trade-sticker').value;
+            const msg = document.getElementById('trade-msg').value.trim();
             if (!to || to === 'Aucun ami') { showToast('⚠️ Choisis un ami !'); return; }
-            if (!stickerKey || stickerKey === 'Pas de sticker') { showToast('⚠️ Choisis un sticker !'); return; }
+            if (!key || key === 'Pas de sticker') { showToast('⚠️ Choisis un sticker !'); return; }
 
-            const item = state.inventory[stickerKey];
-            if (!item || item.count < 1) { showToast('⚠️ Tu n\'as pas ce sticker !'); return; }
+            const item = myState.inventory[key];
+            if (!item || item.count < 1) { showToast('⚠️ Pas assez !'); return; }
 
-            // Enlever le sticker
             item.count--;
-            if (item.count <= 0) delete state.inventory[stickerKey];
-            localStorage.setItem('receiptit_state_' + currentUser, JSON.stringify({ ...JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}'), inventory: state.inventory }));
+            if (item.count <= 0) delete myState.inventory[key];
 
-            // Créer le trade
-            trades.push({
-                id: Date.now(), from: currentUser, to: to,
-                stickerKey: stickerKey, stickerName: item.name, stickerIcon: item.icon, stickerRarity: item.rarity,
-                message: msg || '🎁 Un cadeau pour toi !',
-                status: 'pending', date: new Date().toISOString()
-            });
-            saveTrades();
-            showToast('✅ Sticker envoyé à @' + to + ' !');
-            renderTrades();
-            populateSelects();
+            trades.push({ id:Date.now(), from:currentUser, to, stickerKey:key, stickerName:item.n||item.name, stickerIcon:item.i||item.icon, stickerRarity:item.rarity, message:msg||'🎁 Pour toi !', status:'pending', date:new Date().toISOString() });
+            saveState(); saveTrades();
+            document.getElementById('trade-msg').value = '';
+            showToast('✅ Envoyé à @'+to);
+            renderAll(); populateSelects();
         }
 
-        function acceptTrade(tradeId) {
-            const trade = trades.find(t => t.id === tradeId);
-            if (!trade || trade.to !== currentUser) return;
-
-            const key = trade.stickerKey;
-            if (!state.inventory[key]) state.inventory[key] = { name: trade.stickerName, icon: trade.stickerIcon, rarity: trade.stickerRarity, count: 0 };
-            state.inventory[key].count++;
-            localStorage.setItem('receiptit_state_' + currentUser, JSON.stringify({ ...JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}'), inventory: state.inventory }));
-
-            trades = trades.filter(t => t.id !== tradeId);
-            saveTrades();
-            showToast('✅ Sticker reçu !');
-            renderTrades();
-            loadState();
+        function acceptTrade(id) {
+            const t = trades.find(tr => tr.id === id);
+            if (!t || t.to !== currentUser) return;
+            const key = t.stickerKey;
+            if (!myState.inventory[key]) myState.inventory[key] = { n:t.stickerName, i:t.stickerIcon, rarity:t.stickerRarity, count:0 };
+            myState.inventory[key].count++;
+            trades = trades.filter(tr => tr.id !== id);
+            saveState(); saveTrades();
+            showToast('✅ Reçu !');
+            renderAll();
         }
 
-        function rejectTrade(tradeId) {
-            const trade = trades.find(t => t.id === tradeId);
-            if (!trade) return;
-            // Rendre le sticker à l'envoyeur
-            const senderState = JSON.parse(localStorage.getItem('receiptit_state_' + trade.from) || '{}');
+        function rejectTrade(id) {
+            const t = trades.find(tr => tr.id === id);
+            if (!t) return;
+            const senderState = JSON.parse(localStorage.getItem('receiptit_state_'+t.from)||'{}');
             if (!senderState.inventory) senderState.inventory = {};
-            if (!senderState.inventory[trade.stickerKey]) senderState.inventory[trade.stickerKey] = { name: trade.stickerName, icon: trade.stickerIcon, rarity: trade.stickerRarity, count: 0 };
-            senderState.inventory[trade.stickerKey].count++;
-            localStorage.setItem('receiptit_state_' + trade.from, JSON.stringify(senderState));
-
-            trades = trades.filter(t => t.id !== tradeId);
+            if (!senderState.inventory[t.stickerKey]) senderState.inventory[t.stickerKey] = { n:t.stickerName, i:t.stickerIcon, rarity:t.stickerRarity, count:0 };
+            senderState.inventory[t.stickerKey].count++;
+            localStorage.setItem('receiptit_state_'+t.from, JSON.stringify(senderState));
+            trades = trades.filter(tr => tr.id !== id);
             saveTrades();
             showToast('❌ Refusé');
-            renderTrades();
+            renderAll();
         }
 
-        function renderTrades() {
-            const received = document.getElementById('received-trades');
-            const myReceived = trades.filter(t => t.to === currentUser);
-            received.innerHTML = myReceived.length ? myReceived.map(t => `
+        function renderAll() {
+            const received = trades.filter(t => t.to === currentUser);
+            const sent = trades.filter(t => t.from === currentUser);
+
+            document.getElementById('received-count').textContent = received.length;
+            document.getElementById('received-trades').innerHTML = received.length ? received.map(t => `
                 <div class="card" style="display:flex;align-items:center;gap:12px;">
                     <span style="font-size:2rem;">${t.stickerIcon}</span>
                     <div style="flex:1;"><strong>${t.stickerName}</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">De @${t.from} · ${t.message}</span></div>
-                    <button class="btn-small" onclick="acceptTrade(${t.id})" style="margin-right:4px;">✅</button>
+                    <button class="btn-small" onclick="acceptTrade(${t.id})">✅</button>
                     <button class="btn-small outline" onclick="rejectTrade(${t.id})" style="border-color:var(--danger);color:var(--danger);">❌</button>
-                </div>`).join('') : '<div class="empty-state"><p>Aucune demande.</p></div>';
+                </div>`).join('') : '<p style="color:var(--text-dim);font-size:0.8rem;">Aucune.</p>';
 
-            const sent = document.getElementById('sent-trades');
-            const mySent = trades.filter(t => t.from === currentUser);
-            sent.innerHTML = mySent.length ? mySent.map(t => `
+            document.getElementById('sent-count').textContent = sent.length;
+            document.getElementById('sent-trades').innerHTML = sent.length ? sent.map(t => `
                 <div class="card" style="display:flex;align-items:center;gap:12px;opacity:0.7;">
                     <span style="font-size:2rem;">${t.stickerIcon}</span>
-                    <div style="flex:1;"><strong>${t.stickerName}</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">À @${t.to} · En attente</span></div>
-                </div>`).join('') : '<div class="empty-state"><p>Aucune demande.</p></div>';
+                    <div style="flex:1;"><strong>${t.stickerName}</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">À @${t.to} · ${t.message}</span></div>
+                    <span style="font-size:0.7rem;color:var(--text-dim);">En attente</span>
+                </div>`).join('') : '<p style="color:var(--text-dim);font-size:0.8rem;">Aucune.</p>';
         }
 
-        function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+        function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500); }
 
-        document.addEventListener('DOMContentLoaded', () => { loadState(); populateSelects(); renderTrades(); });
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            document.getElementById('nav-points').textContent = myState.points;
+            populateSelects(); renderAll();
+        });
     </script>
 </body>
 </html>
