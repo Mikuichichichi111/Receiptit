@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Receiptit - Connexion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+
+    <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;z-index:1;padding:20px;">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-logo">
+                    <span class="logo-emoji">🧾</span>
+                    <span class="logo-text">RECEIPTIT</span>
+                </div>
+
+                <div class="login-tabs">
+                    <button class="login-tab active" onclick="switchTab('login')">Connexion</button>
+                    <button class="login-tab" onclick="switchTab('register')">Inscription</button>
+                    <button class="login-tab" onclick="switchTab('forgot')">Mdp oublié</button>
+                </div>
+
+                <div class="error-msg" id="error-msg"></div>
+
+                <!-- CONNEXION -->
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label>👤 Nom d'utilisateur</label>
+                        <input type="text" id="login-username" placeholder="Ton pseudo..." maxlength="30" required autocomplete="username">
+                    </div>
+                    <div class="input-group">
+                        <label>🔒 Mot de passe</label>
+                        <input type="password" id="login-password" placeholder="Ton mot de passe..." maxlength="50" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn-primary">✨ Se connecter</button>
+                </form>
+
+                <!-- INSCRIPTION -->
+                <form id="register-form" style="display:none;" onsubmit="handleRegister(event)">
+                    <div class="input-group">
+                        <label>👤 Nom d'utilisateur</label>
+                        <input type="text" id="reg-username" placeholder="Choisis un pseudo..." maxlength="30" required autocomplete="username">
+                    </div>
+                    <div class="input-group">
+                        <label>🔒 Mot de passe</label>
+                        <input type="password" id="reg-password" placeholder="Choisis un mot de passe..." maxlength="50" required autocomplete="new-password">
+                    </div>
+                    <div class="input-group">
+                        <label>🔒 Confirmer le mot de passe</label>
+                        <input type="password" id="reg-confirm" placeholder="Retape ton mot de passe..." maxlength="50" required autocomplete="new-password">
+                    </div>
+                    <div class="input-group">
+                        <label>🛡️ Question de sécurité (obligatoire)</label>
+                        <select id="reg-question" required>
+                            <option value="">-- Choisis une question --</option>
+                            <option value="Quelle est ta nourriture preferee ?">🍕 Nourriture préférée ?</option>
+                            <option value="Quel est le prenom de ton meilleur ami d'enfance ?">👶 Meilleur ami d'enfance ?</option>
+                            <option value="Quel etait le nom de ton premier animal ?">🐶 Premier animal ?</option>
+                            <option value="Dans quelle ville es-tu ne ?">🏙️ Ville de naissance ?</option>
+                            <option value="Quel est ton livre prefere ?">📚 Livre préféré ?</option>
+                            <option value="Quel est ton film prefere ?">🎬 Film préféré ?</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>✍️ Réponse</label>
+                        <input type="text" id="reg-answer" placeholder="Ta réponse..." maxlength="50" required>
+                    </div>
+                    <div class="input-group" style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="reg-2fa" style="width:20px;height:20px;accent-color:var(--accent);">
+                        <label style="margin:0;font-size:0.85rem;color:var(--text-dim);cursor:pointer;" for="reg-2fa">Activer la 2FA (optionnel)</label>
+                    </div>
+                    <button type="submit" class="btn-primary">🚀 Créer mon compte</button>
+                </form>
+
+                <!-- MOT DE PASSE OUBLIÉ -->
+                <form id="forgot-form" style="display:none;" onsubmit="handleForgot(event)">
+                    <p style="text-align:center;color:var(--text-dim);margin-bottom:16px;font-size:0.9rem;">Entre ton pseudo pour récupérer ton compte.</p>
+                    <div class="input-group">
+                        <label>👤 Nom d'utilisateur</label>
+                        <input type="text" id="forgot-username" placeholder="Ton pseudo..." maxlength="30" required>
+                    </div>
+                    <div id="forgot-section" style="display:none;">
+                        <div class="card" style="text-align:center;margin-top:12px;">
+                            <p style="color:var(--text-dim);margin-bottom:6px;">Ta question :</p>
+                            <p style="font-weight:700;color:var(--accent);margin-bottom:12px;" id="forgot-question-text"></p>
+                            <div class="input-group"><label>✍️ Réponse</label><input type="text" id="forgot-answer" placeholder="Réponse..." maxlength="50"></div>
+                            <div id="forgot-new-section" style="display:none;">
+                                <div class="input-group"><label>🔒 Nouveau mot de passe</label><input type="password" id="forgot-new-password" placeholder="Nouveau..." maxlength="50"></div>
+                                <div class="input-group"><label>🔒 Confirmer</label><input type="password" id="forgot-new-confirm" placeholder="Confirme..." maxlength="50"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" id="forgot-btn">Vérifier</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2FA MODAL -->
+    <div class="modal-overlay" id="2fa-modal">
+        <div class="modal-content">
+            <span class="modal-icon">🔐</span>
+            <div class="modal-title">Vérification 2FA</div>
+            <div class="modal-subtitle" id="2fa-question-text"></div>
+            <input type="text" id="2fa-answer-input" placeholder="Ta réponse..." maxlength="50" style="width:100%;padding:14px;border-radius:12px;border:2px solid rgba(139,92,246,0.2);font-family:'Outfit',sans-serif;text-align:center;margin-bottom:12px;font-size:1rem;">
+            <div class="error-msg" id="2fa-error" style="margin-bottom:12px;"></div>
+            <button class="modal-btn" onclick="verify2FA()">✅ Vérifier</button>
+            <button class="modal-btn secondary" onclick="close2FA()">Annuler</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <script>
+        const SUPABASE_URL = CONFIG.SUPABASE_URL;
+        const SUPABASE_KEY = CONFIG.SUPABASE_KEY;
+        let supabase = null;
+        let supabaseReady = false;
+
+        (async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                supabaseReady = true;
+            } catch (e) { console.error('Supabase error:', e); }
+        })();
+
+        let currentMode = 'login';
+        let pendingUser = null;
+        let forgotStep = 0;
+        let forgotUsername = '';
+
+        function switchTab(mode) {
+            currentMode = mode;
+            forgotStep = 0;
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick*="${mode}"]`).classList.add('active');
+            document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
+            document.getElementById('register-form').style.display = mode === 'register' ? 'block' : 'none';
+            document.getElementById('forgot-form').style.display = mode === 'forgot' ? 'block' : 'none';
+            document.getElementById('error-msg').classList.remove('show');
+            document.getElementById('forgot-section').style.display = 'none';
+            document.getElementById('forgot-new-section').style.display = 'none';
+            document.getElementById('forgot-btn').textContent = 'Vérifier';
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error-msg');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 4000);
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function hashPassword(pw, username) {
+            let h = 0;
+            const s = pw + 'receiptit_salt_' + username;
+            for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h = h & h; }
+            return Math.abs(h).toString(36);
+        }
+
+        function normalizeAnswer(a) {
+            return a.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+        }
+
+        function loginSuccess(username) {
+            localStorage.setItem('receiptit_logged_user', username);
+            const lastLogout = localStorage.getItem('receiptit_last_logout_' + username);
+            const today = new Date().toDateString();
+            if (!lastLogout || new Date(lastLogout).toDateString() !== today) {
+                localStorage.setItem('receiptit_show_ticket_' + username, 'true');
+            }
+            localStorage.setItem('receiptit_login_date_' + username, new Date().toISOString());
+            window.location.href = 'index.html';
+        }
+
+        async function saveUserToSupabase(username, userData) {
+            if (!supabaseReady) return;
+            try {
+                await supabase.from('receiptit_users').upsert({
+                    user_id: userData.userId || 'user_' + Date.now(),
+                    username: username,
+                    password_hash: userData.password,
+                    security_question: userData.securityQuestion,
+                    security_answer: userData.securityAnswer,
+                    two_fa_enabled: userData.twoFAEnabled || false,
+                    points: 0, sessions: [], inventory: {}, packs_opened: 0,
+                    total_sessions: 0, streak: 0, pack_history: [],
+                    equipped_stickers: [], avatar_emoji: '👤',
+                    creation_date: userData.creationDate,
+                    last_login: new Date().toISOString(),
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'username' });
+            } catch (e) { console.error('Save error:', e); }
+        }
+
+        // ============ LOGIN ============
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+            if (!username || !password) { showError('Remplis tous les champs !'); return; }
+
+            // Supabase
+            if (supabaseReady) {
+                try {
+                    const { data, error } = await supabase.from('receiptit_users').select('*').eq('username', username).single();
+                    if (!error && data) {
+                        const hashed = hashPassword(password, username);
+                        if (data.password_hash === hashed) {
+                            if (data.two_fa_enabled) {
+                                pendingUser = { username, data };
+                                trigger2FA(data.security_question, data.security_answer);
+                                return;
+                            }
+                            await supabase.from('receiptit_users').update({ last_login: new Date().toISOString() }).eq('username', username);
+                            loginSuccess(username);
+                            return;
+                        } else { showError('Mot de passe incorrect !'); return; }
+                    }
+                } catch (err) { console.error('Supabase login:', err); }
+            }
+
+            // Fallback localStorage
+            const users = JSON.parse(localStorage.getItem('receiptit_users') || '{}');
+            const user = users[username];
+            if (!user) { showError('Utilisateur introuvable !'); return; }
+            const hashed = hashPassword(password, username);
+            if (user.password !== hashed) { showError('Mot de passe incorrect !'); return; }
+            if (user.twoFAEnabled) { pendingUser = { username, data: user }; trigger2FA(user.securityQuestion, user.securityAnswer); return; }
+            users[username].lastLogin = new Date().toISOString();
+            localStorage.setItem('receiptit_users', JSON.stringify(users));
+            loginSuccess(username);
+        }
+
+        // ============ REGISTER ============
+        async function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value;
+            const confirm = document.getElementById('reg-confirm').value;
+            const question = document.getElementById('reg-question').value;
+            const answer = document.getElementById('reg-answer').value.trim();
+            const twoFA = document.getElementById('reg-2fa').checked;
+
+            if (!username || !password || !question || !answer) { showError('Remplis tous les champs !'); return; }
+            if (username.length < 2) { showError('Pseudo trop court !'); return; }
+            if (password.length < 4) { showError('Mot de passe trop court !'); return; }
+            if (password !== confirm) { showError('Mots de passe différents !'); return; }
+
+            const hashed = hashPassword(password, username);
+            const normalizedAnswer = normalizeAnswer(answer);
+            const creationDate = new Date().toLocaleDateString('fr-FR');
+
+            // Supabase
+            if (supabaseReady) {
+                try {
+                    const { data: exists } = await supabase.from('receiptit_users').select('username').eq('username', username).single();
+                    if (exists) { showError('Ce pseudo existe déjà !'); return; }
+                    await saveUserToSupabase(username, {
+                        userId: 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now(),
+                        password: hashed, securityQuestion: question,
+                        securityAnswer: normalizedAnswer, twoFAEnabled: twoFA, creationDate
+                    });
+                    loginSuccess(username);
+                    showToast('🎉 Compte créé !');
+                    return;
+                } catch (err) { console.error('Supabase register:', err); }
+            }
+
+            // Fallback localStorage
+            const users = JSON.parse(localStorage.getItem('receiptit_users') || '{}');
+            if (users[username]) { showError('Ce pseudo existe déjà !'); return; }
+            users[username] = { password: hashed, securityQuestion: question, securityAnswer: normalizedAnswer, twoFAEnabled: twoFA, creationDate, lastLogin: new Date().toISOString() };
+            localStorage.setItem('receiptit_users', JSON.stringify(users));
+            loginSuccess(username);
+            showToast('🎉 Compte créé !');
+        }
+
+        // ============ FORGOT ============
+        async function handleForgot(e) {
+            e.preventDefault();
+            const username = document.getElementById('forgot-username').value.trim().toLowerCase();
+            if (!username) { showError('Entre ton pseudo !'); return; }
+
+            if (forgotStep === 0) {
+                let user = null;
+                if (supabaseReady) {
+                    try { const { data } = await supabase.from('receiptit_users').select('*').eq('username', username).single(); user = data; } catch (err) {}
+                }
+                if (!user) { const users = JSON.parse(localStorage.getItem('receiptit_users') || '{}'); user = users[username]; }
+                if (!user) { showError('Utilisateur introuvable !'); return; }
+                forgotUsername = username;
+                forgotStep = 1;
+                document.getElementById('forgot-section').style.display = 'block';
+                document.getElementById('forgot-question-text').textContent = user.security_question || user.securityQuestion;
+                document.getElementById('forgot-btn').textContent = 'Vérifier la réponse';
+                document.getElementById('forgot-username').disabled = true;
+                showToast('Réponds à ta question');
+                return;
+            }
+
+            if (forgotStep === 1) {
+                const answer = document.getElementById('forgot-answer').value;
+                if (!answer) { showError('Réponds à la question !'); return; }
+                let user = null;
+                if (supabaseReady) {
+                    try { const { data } = await supabase.from('receiptit_users').select('*').eq('username', forgotUsername).single(); user = data; } catch (err) {}
+                }
+                if (!user) { const users = JSON.parse(localStorage.getItem('receiptit_users') || '{}'); user = users[forgotUsername]; }
+                const userAnswer = user.security_answer || user.securityAnswer;
+                if (normalizeAnswer(answer) !== userAnswer) { showError('Réponse incorrecte !'); return; }
+                forgotStep = 2;
+                document.getElementById('forgot-new-section').style.display = 'block';
+                document.getElementById('forgot-btn').textContent = 'Changer le mot de passe';
+                document.getElementById('forgot-answer').disabled = true;
+                showToast('✅ Choisis un nouveau mot de passe');
+                return;
+            }
+
+            if (forgotStep === 2) {
+                const pw = document.getElementById('forgot-new-password').value;
+                const cf = document.getElementById('forgot-new-confirm').value;
+                if (!pw || pw.length < 4) { showError('Mot de passe trop court !'); return; }
+                if (pw !== cf) { showError('Mots de passe différents !'); return; }
+                const hashed = hashPassword(pw, forgotUsername);
+                if (supabaseReady) {
+                    try { await supabase.from('receiptit_users').update({ password_hash: hashed, updated_at: new Date().toISOString() }).eq('username', forgotUsername); } catch (err) {}
+                }
+                const users = JSON.parse(localStorage.getItem('receiptit_users') || '{}');
+                if (users[forgotUsername]) { users[forgotUsername].password = hashed; localStorage.setItem('receiptit_users', JSON.stringify(users)); }
+                showToast('🎉 Mot de passe changé !');
+                switchTab('login');
+                document.getElementById('login-username').value = forgotUsername;
+            }
+        }
+
+        // ============ 2FA ============
+        function trigger2FA(question, correctAnswer) {
+            document.getElementById('2fa-question-text').textContent = question;
+            document.getElementById('2fa-answer-input').value = '';
+            document.getElementById('2fa-error').classList.remove('show');
+            document.getElementById('2fa-modal').dataset.correctAnswer = correctAnswer;
+            document.getElementById('2fa-modal').classList.add('active');
+            document.getElementById('2fa-answer-input').focus();
+        }
+
+        function verify2FA() {
+            const answer = document.getElementById('2fa-answer-input').value;
+            const correct = document.getElementById('2fa-modal').dataset.correctAnswer;
+            if (!answer) { document.getElementById('2fa-error').textContent = 'Entre ta réponse !'; document.getElementById('2fa-error').classList.add('show'); return; }
+            if (normalizeAnswer(answer) === correct) {
+                close2FA();
+                if (pendingUser) loginSuccess(pendingUser.username);
+            } else {
+                document.getElementById('2fa-error').textContent = '❌ Réponse incorrecte !';
+                document.getElementById('2fa-error').classList.add('show');
+            }
+        }
+
+        function close2FA() {
+            document.getElementById('2fa-modal').classList.remove('active');
+            document.getElementById('2fa-answer-input').value = '';
+            pendingUser = null;
+        }
+
+        document.getElementById('2fa-answer-input').addEventListener('keydown', e => { if (e.key === 'Enter') verify2FA(); });
+        document.getElementById('2fa-modal').addEventListener('click', e => { if (e.target.id === '2fa-modal') close2FA(); });
+
+        // ============ INIT ============
+        document.addEventListener('DOMContentLoaded', () => {
+            const loggedUser = localStorage.getItem('receiptit_logged_user');
+            if (loggedUser) {
+                const users = JSON.parse(localStorage.getItem('receiptit_users') || '{}');
+                if (users[loggedUser]) { window.location.href = 'index.html'; return; }
+            }
+        });
+    </script>
+</body>
+</html>

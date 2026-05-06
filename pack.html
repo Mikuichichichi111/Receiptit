@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Receiptit - Packs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+    <canvas id="particles-canvas"></canvas>
+    <div class="majestic-overlay" id="majestic-overlay"></div>
+
+    <nav class="navbar">
+        <div class="navbar-brand" onclick="window.location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
+        <div class="navbar-actions">
+            <a href="inventory.html" class="navbar-link" title="Inventaire">🎒</a>
+            <a href="sticker-world.html" class="navbar-link" title="Sticker World">🌍</a>
+            <a href="friends.html" class="navbar-link" title="Amis">👥</a>
+            <a href="trades.html" class="navbar-link" title="Échanges">🔄</a>
+            <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
+        </div>
+    </nav>
+
+    <div class="main-content-wide">
+        <div class="section-title">🎁 Choisis ton pack</div>
+        <div class="pack-section" id="packs-container"></div>
+
+        <div class="history-section">
+            <div class="history-title">📜 Historique des drops</div>
+            <div class="history-list" id="history-list">
+                <div style="text-align:center;color:var(--text-dim);font-size:0.85rem;padding:20px;">Aucun pack ouvert. Ouvre ton premier ! 🎁</div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
+        <a href="pomodoro.html" class="nav-item"><span class="nav-icon">⏱️</span><span class="nav-label">Focus</span></a>
+        <a href="session.html" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Session</span></a>
+        <a href="pack.html" class="nav-item active"><span class="nav-icon">🎁</span><span class="nav-label">Pack</span></a>
+        <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
+    </nav>
+
+    <div class="modal-overlay" id="opening-modal">
+        <div class="modal-content" style="max-width:360px;text-align:center;">
+            <span class="modal-icon" id="opening-icon" style="font-size:3rem;">🎁</span>
+            <p style="font-weight:700;" id="opening-name">Ouverture...</p>
+            <p style="font-size:0.8rem;color:var(--text-dim);" id="opening-rarity"></p>
+            <div id="opening-animation" style="font-size:4rem;padding:20px;animation:float 1s ease-in-out infinite;">🎁</div>
+            <button class="modal-btn" id="opening-btn" onclick="revealItem()" style="display:none;">✨ Révéler !</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="result-modal">
+        <div class="modal-content">
+            <span class="modal-icon" id="result-icon">🎁</span>
+            <div class="modal-name" id="result-name">Item</div>
+            <div class="modal-rarity" id="result-rarity">Rarity</div>
+            <button class="modal-btn" onclick="closeResult()">🎉 Super !</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <script>
+        const SUPABASE_URL = CONFIG.SUPABASE_URL;
+        const SUPABASE_KEY = CONFIG.SUPABASE_KEY;
+        let supabase = null, supabaseReady = false;
+        (async function(){ try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); supabaseReady = true; } catch(e) {} })();
+
+        const currentUser = localStorage.getItem('receiptit_logged_user');
+        if (!currentUser) window.location.href = 'login.html';
+
+        let state = {
+            points: 0, sessions: [], inventory: {}, packsOpened: 0,
+            totalSessions: 0, streak: 0, packHistory: [],
+            equippedStickers: [], avatarEmoji: '👤', followers: [], following: [],
+            userId: localStorage.getItem('receiptit_user_id') || 'user_' + Math.random().toString(36).substr(2,9)
+        };
+        let pendingItem = null;
+
+        const RARITY_COLORS = { common: '#94a3b8', rare: '#60a5fa', epic: '#a78bfa', legendary: '#fbbf24', divine: '#f472b6' };
+        const RARITY_NAMES = { common: 'Commun', rare: 'Rare', epic: 'Épique', legendary: 'Légendaire', divine: 'Divin' };
+        const RARITY_EMOJIS = { common: '⭐', rare: '🔵', epic: '🟣', legendary: '🟠', divine: '🔴' };
+
+        const ITEMS = {
+            common: [{name:'Stylo Bic',icon:'🖊️'},{name:'Gomme',icon:'🧼'},{name:'Règle',icon:'📏'},{name:'Crayon',icon:'✏️'},{name:'Post-it',icon:'📝'},{name:'Trombone',icon:'📎'}],
+            rare: [{name:'Café Premium',icon:'☕'},{name:'Lampe LED',icon:'💡'},{name:'Casque Audio',icon:'🎧'},{name:'Clé USB',icon:'🔑'}],
+            epic: [{name:'Tablette',icon:'📱'},{name:'Enceinte BT',icon:'🔊'},{name:'Montre',icon:'⌚'},{name:'Appareil Photo',icon:'📷'}],
+            legendary: [{name:'MacBook Pro',icon:'💻'},{name:'iPad Pro',icon:'📲'},{name:'PS5',icon:'🎮'},{name:'Drone',icon:'🚁'}],
+            divine: [{name:'Tesla',icon:'🚗'},{name:'Yacht',icon:'🛥️'},{name:'Jet Privé',icon:'✈️'},{name:'Île Privée',icon:'🏝️'},{name:'Licorne',icon:'🦄'}]
+        };
+
+        const PACKS = [
+            {id:'normal',name:'Pack Normal',icon:'📦',cost:100,color:'#94a3b8',probs:{common:70,rare:20,epic:9,legendary:0.9,divine:0.1},guaranteed:null,theme:null},
+            {id:'premium',name:'Pack Premium',icon:'⭐',cost:250,color:'#60a5fa',probs:{common:50,rare:30,epic:15,legendary:4,divine:1},guaranteed:null,theme:null},
+            {id:'epic',name:'Pack Épique',icon:'🔮',cost:500,color:'#a78bfa',probs:{common:20,rare:35,epic:30,legendary:12,divine:3},guaranteed:'rare',theme:null},
+            {id:'legendary',name:'Pack Légendaire',icon:'👑',cost:1000,color:'#fbbf24',probs:{common:0,rare:20,epic:40,legendary:30,divine:10},guaranteed:'epic',theme:null},
+            {id:'divine',name:'Pack Divin',icon:'🌟',cost:2500,color:'#f472b6',probs:{common:0,rare:0,epic:30,legendary:45,divine:25},guaranteed:'legendary',theme:null},
+            {id:'ultimate',name:'Pack Ultime',icon:'💫',cost:5000,color:'#fbbf24',probs:{common:0,rare:0,epic:0,legendary:50,divine:50},guaranteed:'legendary',theme:null},
+            {id:'mystery',name:'Pack Mystère',icon:'🎲',cost:150,color:'#818cf8',probs:{common:60,rare:25,epic:10,legendary:4,divine:1},guaranteed:null,theme:null,bonus:true}
+        ];
+
+        function saveLocal() { localStorage.setItem('receiptit_state_' + currentUser, JSON.stringify(state)); }
+        function loadLocal() { const s = localStorage.getItem('receiptit_state_' + currentUser); if (s) try { state = { ...state, ...JSON.parse(s) }; } catch(e) {} }
+
+        function renderPacks() {
+            document.getElementById('packs-container').innerHTML = PACKS.map(p => {
+                const can = state.points >= p.cost;
+                return `<div class="card" style="border:2px solid ${p.color}20;position:relative;">
+                    ${p.guaranteed ? `<div style="position:absolute;top:10px;right:10px;background:${RARITY_COLORS[p.guaranteed]};color:white;padding:4px 10px;border-radius:8px;font-size:0.7rem;font-weight:700;">GARANTI</div>` : ''}
+                    ${p.bonus ? `<div style="position:absolute;top:10px;right:10px;background:#fbbf24;color:#1e1b4b;padding:4px 10px;border-radius:8px;font-size:0.7rem;font-weight:700;">+BONUS</div>` : ''}
+                    <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
+                        <div style="font-size:3rem;">${p.icon}</div>
+                        <div>
+                            <div style="font-weight:700;font-size:1rem;">${p.name}</div>
+                            <div style="font-family:'Space Mono',monospace;color:#fbbf24;font-weight:700;">⭐ ${p.cost} pts</div>
+                            ${p.guaranteed ? `<div style="font-size:0.7rem;color:var(--success);">✅ ${RARITY_NAMES[p.guaranteed]} minimum</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="prob-bar">${Object.entries(p.probs).map(([r,pr]) => pr > 0 ? `<div class="prob-segment" style="width:${pr}%;background:${RARITY_COLORS[r]};">${pr>=10?Math.round(pr)+'%':''}</div>` : '').join('')}</div>
+                    <div style="display:flex;gap:6px;font-size:0.65rem;flex-wrap:wrap;margin-bottom:8px;">${Object.entries(p.probs).map(([r,pr]) => pr>0?`<span style="color:${RARITY_COLORS[r]};font-weight:600;">${RARITY_EMOJIS[r]} ${Math.round(pr)}%</span>`:'').join('')}</div>
+                    <details style="cursor:pointer;"><summary style="font-size:0.8rem;font-weight:600;color:var(--text-dim);">👁️ Voir les items possibles</summary>
+                        <div style="margin-top:8px;">${['divine','legendary','epic','rare','common'].map(r => {
+                            if (p.probs[r] <= 0) return '';
+                            const items = ITEMS[r] || [];
+                            return `<div style="margin-bottom:4px;"><span style="color:${RARITY_COLORS[r]};font-weight:700;font-size:0.7rem;">${RARITY_EMOJIS[r]} ${RARITY_NAMES[r]}</span>
+                                <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px;">${items.map(i => `<span style="background:${RARITY_COLORS[r]}15;padding:2px 6px;border-radius:6px;font-size:0.7rem;">${i.icon} ${i.name}</span>`).join('')}</div></div>`;
+                        }).join('')}</div>
+                    </details>
+                    <button class="btn-primary" style="margin-top:10px;background:${can?`linear-gradient(135deg,${p.color},var(--accent))`:'#ccc'};" ${!can?'disabled':''} onclick="openPack('${p.id}')">${can?'✨ Ouvrir':'⭐ '+state.points+'/'+p.cost}</button>
+                </div>`;
+            }).join('');
+        }
+
+        function getRarity(probs) {
+            const rand = Math.random() * 100; let cum = 0;
+            for (const [r, pr] of Object.entries(probs)) { cum += pr; if (rand < cum) return r; }
+            return 'common';
+        }
+
+        function openPack(id) {
+            const pack = PACKS.find(p => p.id === id);
+            if (!pack || state.points < pack.cost) { showToast('⚠️ Pas assez de points !'); return; }
+            state.points -= pack.cost; state.packsOpened++;
+            let rarity = getRarity(pack.probs);
+            if (pack.guaranteed) {
+                const order = ['common','rare','epic','legendary','divine'];
+                if (order.indexOf(rarity) < order.indexOf(pack.guaranteed)) rarity = pack.guaranteed;
+            }
+            const item = ITEMS[rarity]?.[Math.floor(Math.random() * ITEMS[rarity].length)] || ITEMS.common[0];
+            pendingItem = { ...item, rarity, packName: pack.name };
+            document.getElementById('opening-icon').textContent = pack.icon;
+            document.getElementById('opening-name').textContent = pack.name;
+            document.getElementById('opening-rarity').textContent = 'Ouverture...';
+            document.getElementById('opening-animation').style.display = 'block';
+            document.getElementById('opening-btn').style.display = 'none';
+            document.getElementById('opening-modal').classList.add('active');
+            setTimeout(() => {
+                document.getElementById('opening-animation').style.display = 'none';
+                document.getElementById('opening-btn').style.display = 'block';
+                document.getElementById('opening-rarity').textContent = 'Prêt ?';
+            }, 1500);
+            updatePointsDisplay();
+        }
+
+        function revealItem() {
+            if (!pendingItem) return;
+            const item = pendingItem;
+            const key = item.rarity + '_' + item.name;
+            if (!state.inventory[key]) state.inventory[key] = { ...item, count: 0 };
+            state.inventory[key].count++;
+            state.packHistory.unshift({ name: item.name, icon: item.icon, rarity: item.rarity, packName: item.packName, time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) });
+            if (state.packHistory.length > 50) state.packHistory.pop();
+            saveLocal();
+            document.getElementById('opening-modal').classList.remove('active');
+            document.getElementById('result-icon').textContent = item.icon;
+            document.getElementById('result-name').textContent = item.name;
+            document.getElementById('result-name').style.color = RARITY_COLORS[item.rarity];
+            document.getElementById('result-rarity').textContent = RARITY_NAMES[item.rarity];
+            document.getElementById('result-rarity').style.color = RARITY_COLORS[item.rarity];
+            document.getElementById('result-modal').classList.add('active');
+            if (item.rarity === 'legendary' || item.rarity === 'divine') {
+                document.getElementById('majestic-overlay').classList.add('active');
+                document.body.classList.add('shake');
+                setTimeout(() => { document.getElementById('majestic-overlay').classList.remove('active'); document.body.classList.remove('shake'); }, 2000);
+                launchParticles();
+            }
+            updateHistory(); renderPacks(); pendingItem = null;
+        }
+
+        function closeResult() { document.getElementById('result-modal').classList.remove('active'); }
+
+        function launchParticles() {
+            const canvas = document.getElementById('particles-canvas'), ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const particles = [], colors = ['#fbbf24','#f59e0b','#fcd34d','#f472b6'];
+            for (let i = 0; i < 100; i++) particles.push({ x: canvas.width/2, y: canvas.height/2, vx: (Math.random()-0.5)*16, vy: (Math.random()-0.5)*16-5, size: Math.random()*7+2, color: colors[Math.floor(Math.random()*colors.length)], life: 1, decay: Math.random()*0.012+0.006 });
+            (function anim() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); let alive = false;
+                particles.forEach(p => { if (p.life > 0) { alive = true; p.x += p.vx; p.y += p.vy; p.vy += 0.14; p.life -= p.decay; ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.shadowBlur = 10; ctx.shadowColor = p.color; ctx.fillRect(p.x, p.y, p.size, p.size); } });
+                if (alive) requestAnimationFrame(anim);
+            })();
+        }
+
+        function updatePointsDisplay() { document.getElementById('nav-points').textContent = state.points; }
+        function updateHistory() {
+            const list = document.getElementById('history-list');
+            if (!state.packHistory.length) { list.innerHTML = '<div style="text-align:center;color:var(--text-dim);font-size:0.85rem;padding:20px;">Aucun pack ouvert. 🎁</div>'; return; }
+            list.innerHTML = state.packHistory.slice(0,20).map(h => `<div class="history-item"><span class="hi-icon">${h.icon}</span><div class="hi-info"><div class="hi-name">${h.name}</div><div class="hi-rarity" style="color:${RARITY_COLORS[h.rarity]}">${RARITY_NAMES[h.rarity]} · ${h.packName||''}</div></div><div class="hi-time">${h.time}</div></div>`).join('');
+        }
+        function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+
+        document.addEventListener('DOMContentLoaded', () => { loadLocal(); updatePointsDisplay(); renderPacks(); updateHistory(); });
+        document.getElementById('opening-modal').addEventListener('click', e => { if (e.target.id === 'opening-modal') { document.getElementById('opening-modal').classList.remove('active'); pendingItem = null; } });
+        document.getElementById('result-modal').addEventListener('click', e => { if (e.target.id === 'result-modal') closeResult(); });
+    </script>
+</body>
+</html>

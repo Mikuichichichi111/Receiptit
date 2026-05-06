@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Receiptit - Inventaire</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+
+    <nav class="navbar">
+        <div class="navbar-brand" onclick="window.location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
+        <div class="navbar-actions">
+            <a href="inventory.html" class="navbar-link" title="Inventaire" style="color:var(--accent);">🎒</a>
+            <a href="sticker-world.html" class="navbar-link" title="Sticker World">🌍</a>
+            <a href="friends.html" class="navbar-link" title="Amis">👥</a>
+            <a href="trades.html" class="navbar-link" title="Échanges">🔄</a>
+            <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="filter-tabs">
+            <div class="filter-tab active" data-filter="all" onclick="filterItems('all')">📦 Tout</div>
+            <div class="filter-tab" data-filter="common" onclick="filterItems('common')">⭐ Commun</div>
+            <div class="filter-tab" data-filter="rare" onclick="filterItems('rare')">🔵 Rare</div>
+            <div class="filter-tab" data-filter="epic" onclick="filterItems('epic')">🟣 Épique</div>
+            <div class="filter-tab" data-filter="legendary" onclick="filterItems('legendary')">🟠 Légendaire</div>
+            <div class="filter-tab" data-filter="divine" onclick="filterItems('divine')">🔴 Divin</div>
+        </div>
+
+        <div class="inv-stats">
+            <div class="inv-stat"><div class="is-dot" style="background:var(--rarity-common);"></div><span class="is-value" id="count-common">0</span><span class="is-label">Commun</span></div>
+            <div class="inv-stat"><div class="is-dot" style="background:var(--rarity-rare);"></div><span class="is-value" id="count-rare">0</span><span class="is-label">Rare</span></div>
+            <div class="inv-stat"><div class="is-dot" style="background:var(--rarity-epic);"></div><span class="is-value" id="count-epic">0</span><span class="is-label">Épique</span></div>
+            <div class="inv-stat"><div class="is-dot" style="background:var(--rarity-legendary);box-shadow:0 0 6px var(--rarity-legendary);"></div><span class="is-value" id="count-legendary">0</span><span class="is-label">Lég.</span></div>
+            <div class="inv-stat"><div class="is-dot" style="background:var(--rarity-divine);box-shadow:0 0 6px var(--rarity-divine);"></div><span class="is-value" id="count-divine">0</span><span class="is-label">Divin</span></div>
+        </div>
+
+        <div class="inventory-grid" id="inventory-grid">
+            <div class="empty-state" style="grid-column:span 3;"><div class="empty-icon">🎒</div><h3>Inventaire vide</h3><p>Ouvre des packs !</p></div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
+        <a href="pomodoro.html" class="nav-item"><span class="nav-icon">⏱️</span><span class="nav-label">Focus</span></a>
+        <a href="session.html" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Session</span></a>
+        <a href="pack.html" class="nav-item"><span class="nav-icon">🎁</span><span class="nav-label">Pack</span></a>
+        <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
+    </nav>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-icon" id="modal-icon">🎁</span>
+            <div class="modal-name" id="modal-name">Item</div>
+            <div class="modal-rarity" id="modal-rarity">Rarity</div>
+            <div class="modal-count" id="modal-count">x1</div>
+            <button class="modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        const currentUser = localStorage.getItem('receiptit_logged_user');
+        if (!currentUser) window.location.href = 'login.html';
+
+        let state = { points: 0, inventory: {} };
+        let currentFilter = 'all';
+
+        const RARITY_COLORS = { common: '#94a3b8', rare: '#60a5fa', epic: '#a78bfa', legendary: '#fbbf24', divine: '#f472b6' };
+        const RARITY_NAMES = { common: 'Commun', rare: 'Rare', epic: 'Épique', legendary: 'Légendaire', divine: 'Divin' };
+        const RARITY_ORDER = { divine: 5, legendary: 4, epic: 3, rare: 2, common: 1 };
+
+        function loadLocal() {
+            const s = localStorage.getItem('receiptit_state_' + currentUser);
+            if (s) try { state = { ...state, ...JSON.parse(s) }; } catch(e) {}
+        }
+
+        function updatePointsDisplay() { document.getElementById('nav-points').textContent = state.points; }
+
+        function updateStats() {
+            const counts = { common: 0, rare: 0, epic: 0, legendary: 0, divine: 0 };
+            Object.values(state.inventory).forEach(item => { if (counts[item.rarity] !== undefined) counts[item.rarity] += item.count || 0; });
+            Object.keys(counts).forEach(r => { const el = document.getElementById('count-' + r); if (el) el.textContent = counts[r]; });
+        }
+
+        function filterItems(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-filter="${filter}"]`)?.classList.add('active');
+            renderInventory();
+        }
+
+        function renderInventory() {
+            const grid = document.getElementById('inventory-grid');
+            const items = Object.entries(state.inventory).map(([key, item]) => ({ key, ...item }));
+            const filtered = currentFilter === 'all' ? items : items.filter(i => i.rarity === currentFilter);
+
+            if (!filtered.length) {
+                grid.innerHTML = `<div class="empty-state" style="grid-column:span 3;"><div class="empty-icon">🎒</div><h3>${currentFilter==='all'?'Inventaire vide':'Aucun item'}</h3><p>Ouvre des packs !</p></div>`;
+                updateStats(); return;
+            }
+
+            filtered.sort((a, b) => (RARITY_ORDER[b.rarity] - RARITY_ORDER[a.rarity]) || (b.count||0) - (a.count||0));
+
+            grid.innerHTML = filtered.map(item => `
+                <div class="inv-item" onclick="showDetail('${item.name.replace(/'/g,"\\'")}','${item.rarity}','${item.icon}',${item.count||1})">
+                    <div class="item-rarity-bar" style="background:${RARITY_COLORS[item.rarity]};"></div>
+                    <span class="item-icon">${item.icon}</span>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-rarity" style="color:${RARITY_COLORS[item.rarity]}">${RARITY_NAMES[item.rarity]}</div>
+                    <span class="item-count">x${item.count||1}</span>
+                </div>
+            `).join('');
+            updateStats();
+        }
+
+        function showDetail(name, rarity, icon, count) {
+            document.getElementById('modal-icon').textContent = icon;
+            document.getElementById('modal-name').textContent = name;
+            document.getElementById('modal-name').style.color = RARITY_COLORS[rarity];
+            document.getElementById('modal-rarity').textContent = RARITY_NAMES[rarity];
+            document.getElementById('modal-rarity').style.color = RARITY_COLORS[rarity];
+            document.getElementById('modal-count').textContent = 'Tu en as ' + count;
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
+
+        document.addEventListener('DOMContentLoaded', () => { loadLocal(); updatePointsDisplay(); updateStats(); renderInventory(); });
+        document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target.id === 'modal-overlay') closeModal(); });
+    </script>
+</body>
+</html>

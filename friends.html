@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Receiptit - Amis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+
+    <nav class="navbar">
+        <div class="navbar-brand" onclick="window.location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
+        <div class="navbar-actions">
+            <a href="inventory.html" class="navbar-link" title="Inventaire">🎒</a>
+            <a href="sticker-world.html" class="navbar-link" title="Sticker World">🌍</a>
+            <a href="friends.html" class="navbar-link" title="Amis" style="color:var(--accent);">👥</a>
+            <a href="trades.html" class="navbar-link" title="Échanges">🔄</a>
+            <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="section-title">👥 Mes amis</div>
+
+        <div class="card">
+            <h3>🤝 Sessions collaboratives</h3>
+            <p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:12px;">Fais une session avec un ami et gagnez +20% de points bonus !</p>
+            <div id="collab-section">
+                <p style="font-size:0.8rem;color:var(--text-light);">Chargement...</p>
+            </div>
+            <button class="btn-primary" onclick="startCollabSession()" style="margin-top:8px;">🚀 Lancer une session à 2</button>
+        </div>
+
+        <div class="section-title">👀 Mes follows</div>
+        <div id="following-list">
+            <div class="empty-state"><p>Aucun follow. Va dans Sticker World !</p></div>
+        </div>
+
+        <div class="section-title">👥 Mes followers</div>
+        <div id="followers-list">
+            <div class="empty-state"><p>Aucun follower pour le moment.</p></div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
+        <a href="pomodoro.html" class="nav-item"><span class="nav-icon">⏱️</span><span class="nav-label">Focus</span></a>
+        <a href="session.html" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Session</span></a>
+        <a href="pack.html" class="nav-item"><span class="nav-icon">🎁</span><span class="nav-label">Pack</span></a>
+        <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
+    </nav>
+
+    <div class="modal-overlay" id="collab-modal">
+        <div class="modal-content">
+            <span class="modal-icon">🤝</span>
+            <div class="modal-title">Session collaborative</div>
+            <div class="modal-subtitle">Choisis un ami pour une session ensemble !</div>
+            <select id="collab-friend-select" style="width:100%;padding:12px;border-radius:12px;border:2px solid rgba(139,92,246,0.2);font-family:'Outfit',sans-serif;margin-bottom:12px;"></select>
+            <button class="modal-btn" onclick="confirmCollab()">✅ C'est parti !</button>
+            <button class="modal-btn secondary" onclick="closeCollabModal()">Annuler</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const currentUser = localStorage.getItem('receiptit_logged_user');
+        if (!currentUser) window.location.href = 'login.html';
+
+        let state = { following: [], followers: [], points: 0 };
+
+        function loadState() {
+            const s = localStorage.getItem('receiptit_state_' + currentUser);
+            if (s) try { state = { ...state, ...JSON.parse(s) }; } catch(e) {}
+        }
+
+        function getOtherState(username) {
+            const s = localStorage.getItem('receiptit_state_' + username);
+            if (s) try { return JSON.parse(s); } catch(e) {}
+            return {};
+        }
+
+        function renderFollowing() {
+            const list = document.getElementById('following-list');
+            if (!state.following || !state.following.length) {
+                list.innerHTML = '<div class="empty-state"><p>Aucun follow. Va dans Sticker World !</p></div>';
+                return;
+            }
+            list.innerHTML = state.following.map(username => {
+                const os = getOtherState(username);
+                return `<div class="user-row">
+                    <div class="user-avatar">${os.avatarEmoji||'👤'}</div>
+                    <div class="user-info"><div class="user-name">@${username}</div><div class="user-meta">⭐ ${os.points||0} · 🔥 ${os.streak||0}j</div></div>
+                    <button class="btn-small outline" onclick="unfollow('${username}')">💔</button>
+                </div>`;
+            }).join('');
+        }
+
+        function renderFollowers() {
+            const list = document.getElementById('followers-list');
+            const users = JSON.parse(localStorage.getItem('receiptit_users') || '{}');
+            const followers = [];
+            Object.keys(users).forEach(username => {
+                const os = getOtherState(username);
+                if ((os.following || []).includes(currentUser)) followers.push(username);
+            });
+            if (!followers.length) { list.innerHTML = '<div class="empty-state"><p>Aucun follower.</p></div>'; return; }
+            list.innerHTML = followers.map(username => {
+                const os = getOtherState(username);
+                return `<div class="user-row">
+                    <div class="user-avatar">${os.avatarEmoji||'👤'}</div>
+                    <div class="user-info"><div class="user-name">@${username}</div><div class="user-meta">⭐ ${os.points||0}</div></div>
+                </div>`;
+            }).join('');
+        }
+
+        function unfollow(username) {
+            state.following = (state.following || []).filter(f => f !== username);
+            localStorage.setItem('receiptit_state_' + currentUser, JSON.stringify({ ...JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}'), following: state.following }));
+            renderFollowing();
+            showToast('💔 Unfollow');
+        }
+
+        function startCollabSession() {
+            document.getElementById('collab-friend-select').innerHTML = (state.following || []).map(f => `<option value="${f}">@${f}</option>`).join('') || '<option>Aucun ami</option>';
+            document.getElementById('collab-modal').classList.add('active');
+        }
+
+        function confirmCollab() {
+            const friend = document.getElementById('collab-friend-select').value;
+            if (!friend || friend === 'Aucun ami') { showToast('⚠️ Choisis un ami !'); return; }
+            closeCollabModal();
+            localStorage.setItem('receiptit_collab_partner', friend);
+            localStorage.setItem('receiptit_collab_bonus', '1.2');
+            window.location.href = 'pomodoro.html';
+        }
+
+        function closeCollabModal() { document.getElementById('collab-modal').classList.remove('active'); }
+        function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+
+        document.addEventListener('DOMContentLoaded', () => { loadState(); renderFollowing(); renderFollowers(); });
+        document.getElementById('collab-modal').addEventListener('click', e => { if (e.target.id === 'collab-modal') closeCollabModal(); });
+    </script>
+</body>
+</html>
