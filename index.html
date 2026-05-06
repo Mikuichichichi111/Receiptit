@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Receiptit - Connexion</title>
+    <title>Receiptit - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,67 +11,68 @@
     <div class="bg-blob blob-1"></div>
     <div class="bg-blob blob-2"></div>
     <div class="bg-blob blob-3"></div>
+    <canvas id="confetti-canvas"></canvas>
 
-    <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;z-index:1;padding:20px;">
-        <div class="login-container">
-            <div class="login-card">
-                <div class="login-logo">
-                    <span class="logo-emoji">🧾</span>
-                    <span class="logo-text">RECEIPTIT</span>
-                </div>
+    <nav class="navbar">
+        <div class="navbar-brand" onclick="window.location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
+        <div class="navbar-actions">
+            <a href="inventory.html" class="navbar-link" title="Inventaire">🎒</a>
+            <a href="sticker-world.html" class="navbar-link" title="Sticker World">🌍</a>
+            <a href="friends.html" class="navbar-link" title="Amis">👥</a>
+            <a href="trades.html" class="navbar-link" title="Échanges">🔄</a>
+            <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
+        </div>
+    </nav>
 
-                <div class="login-tabs">
-                    <button class="login-tab active" onclick="switchTab('login')">Connexion</button>
-                    <button class="login-tab" onclick="switchTab('register')">Inscription</button>
-                    <button class="login-tab" onclick="switchTab('forgot')">Mdp oublié</button>
-                </div>
+    <div class="main-content">
+        <div class="welcome-card">
+            <h1 id="welcome-name">Salut ! 👋</h1>
+            <p>Prêt à bosser aujourd'hui ?</p>
+            <div class="welcome-streak"><span>🔥</span><span id="streak-count">0 jours</span></div>
+        </div>
 
-                <div class="error-msg" id="error-msg"></div>
+        <div class="stats-row">
+            <div class="stat-card"><span class="stat-icon">📚</span><div class="stat-value" id="stat-sessions">0</div><div class="stat-label">Sessions</div></div>
+            <div class="stat-card"><span class="stat-icon">🎁</span><div class="stat-value" id="stat-packs">0</div><div class="stat-label">Packs</div></div>
+            <div class="stat-card"><span class="stat-icon">🎒</span><div class="stat-value" id="stat-items">0</div><div class="stat-label">Items</div></div>
+        </div>
 
-                <!-- CONNEXION -->
-                <form id="login-form" onsubmit="handleLogin(event)">
-                    <div class="input-group"><label>👤 Nom d'utilisateur</label><input type="text" id="login-username" placeholder="Ton pseudo..." maxlength="30" required></div>
-                    <div class="input-group"><label>🔒 Mot de passe</label><input type="password" id="login-password" placeholder="Ton mot de passe..." maxlength="50" required></div>
-                    <button type="submit" class="btn-primary">✨ Se connecter</button>
-                </form>
+        <div class="section-title">⚡ Actions rapides</div>
+        <div class="quick-actions">
+            <a href="pomodoro.html" class="action-card pomodoro"><div class="action-icon">⏱️</div><h3>Pomodoro</h3><p>Timer focus</p></a>
+            <a href="session.html" class="action-card session"><div class="action-icon">➕</div><h3>Nouvelle session</h3><p>Leçon ou exercice</p></a>
+            <a href="pack.html" class="action-card pack"><div class="action-icon">🎁</div><h3>Ouvrir un pack</h3><p>Dépense tes pts</p></a>
+            <a href="inventory.html" class="action-card inventory"><div class="action-icon">🎒</div><h3>Inventaire</h3><p>Tes récompenses</p></a>
+            <a href="profile.html" class="action-card profile"><div class="action-icon">👤</div><h3>Profil</h3><p>Stickers & stats</p></a>
+            <a href="sticker-world.html" class="action-card profile"><div class="action-icon">🌍</div><h3>Sticker World</h3><p>Voir les autres</p></a>
+            <a href="friends.html" class="action-card profile"><div class="action-icon">👥</div><h3>Amis</h3><p>Sessions à 2</p></a>
+            <a href="trades.html" class="action-card profile"><div class="action-icon">🔄</div><h3>Échanges</h3><p>Trade stickers</p></a>
+            <div class="action-card ticket" onclick="showTicket()"><div class="action-icon">📄</div><h3>Voir le ticket</h3><p>Dernier récap</p></div>
+        </div>
 
-                <!-- INSCRIPTION -->
-                <form id="register-form" style="display:none;" onsubmit="handleRegister(event)">
-                    <div class="input-group"><label>👤 Nom d'utilisateur</label><input type="text" id="reg-username" placeholder="Choisis un pseudo..." maxlength="30" required></div>
-                    <div class="input-group"><label>🔒 Mot de passe</label><input type="password" id="reg-password" placeholder="Choisis un mot de passe..." maxlength="50" required></div>
-                    <div class="input-group"><label>🔒 Confirmer</label><input type="password" id="reg-confirm" placeholder="Retape..." maxlength="50" required></div>
-                    <div class="input-group"><label>🛡️ Question de sécurité</label>
-                        <select id="reg-question" required>
-                            <option value="">-- Choisis --</option>
-                            <option value="nourriture">🍕 Nourriture préférée ?</option>
-                            <option value="ami">👶 Meilleur ami d'enfance ?</option>
-                            <option value="animal">🐶 Premier animal ?</option>
-                            <option value="ville">🏙️ Ville de naissance ?</option>
-                            <option value="livre">📚 Livre préféré ?</option>
-                            <option value="film">🎬 Film préféré ?</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>✍️ Réponse</label><input type="text" id="reg-answer" placeholder="Ta réponse..." maxlength="50" required></div>
-                    <button type="submit" class="btn-primary">🚀 Créer mon compte</button>
-                </form>
+        <div class="section-title">📋 Sessions récentes</div>
+        <div class="session-list" id="session-list">
+            <div class="empty-state"><div class="empty-icon">📝</div><p>Aucune session encore.</p></div>
+        </div>
+    </div>
 
-                <!-- MOT DE PASSE OUBLIÉ -->
-                <form id="forgot-form" style="display:none;" onsubmit="handleForgot(event)">
-                    <p style="text-align:center;color:var(--text-dim);margin-bottom:16px;font-size:0.9rem;">Entre ton pseudo pour récupérer ton compte.</p>
-                    <div class="input-group"><label>👤 Nom d'utilisateur</label><input type="text" id="forgot-username" placeholder="Ton pseudo..." maxlength="30" required></div>
-                    <div id="forgot-section" style="display:none;">
-                        <div class="card" style="text-align:center;margin-top:12px;">
-                            <p style="color:var(--text-dim);margin-bottom:6px;">Ta question :</p>
-                            <p style="font-weight:700;color:var(--accent);margin-bottom:12px;" id="forgot-question-text"></p>
-                            <div class="input-group"><label>✍️ Réponse</label><input type="text" id="forgot-answer" placeholder="Réponse..." maxlength="50"></div>
-                            <div id="forgot-new-section" style="display:none;">
-                                <div class="input-group"><label>🔒 Nouveau</label><input type="password" id="forgot-new-pw" placeholder="Nouveau..." maxlength="50"></div>
-                                <div class="input-group"><label>🔒 Confirmer</label><input type="password" id="forgot-new-confirm" placeholder="Confirme..." maxlength="50"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-primary" id="forgot-btn">Vérifier</button>
-                </form>
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
+        <a href="pomodoro.html" class="nav-item"><span class="nav-icon">⏱️</span><span class="nav-label">Focus</span></a>
+        <a href="session.html" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Session</span></a>
+        <a href="pack.html" class="nav-item"><span class="nav-icon">🎁</span><span class="nav-label">Pack</span></a>
+        <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
+    </nav>
+
+    <!-- Ticket Modal -->
+    <div class="modal-overlay" id="ticket-modal">
+        <div class="modal-content" style="max-width:420px;padding:0;background:transparent;box-shadow:none;">
+            <div class="printer-container"><div class="printer">🖨️</div></div>
+            <div class="printer-paper" id="printer-paper"><canvas id="ticket-canvas" style="width:100%;display:block;"></canvas></div>
+            <div style="display:flex;gap:0;margin-top:8px;border-radius:14px;overflow:hidden;box-shadow:var(--shadow-lg);">
+                <button onclick="shareTicket()" style="flex:1;padding:14px;border:none;background:white;color:var(--accent);font-family:'Outfit',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;">📤</button>
+                <button onclick="printTicket()" style="flex:1;padding:14px;border:none;border-left:1px solid #eee;background:white;color:var(--accent2);font-family:'Outfit',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;">🖨️</button>
+                <button onclick="closeTicket()" style="flex:1;padding:14px;border:none;border-left:1px solid #eee;background:white;color:var(--text-dim);font-family:'Outfit',sans-serif;font-weight:600;font-size:0.9rem;cursor:pointer;">✕</button>
             </div>
         </div>
     </div>
@@ -85,185 +86,157 @@
         const SUPABASE_KEY = CONFIG.SUPABASE_KEY;
         let supabase = null, supabaseReady = false;
 
-        (async function init() {
-            try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                supabaseReady = true;
-                console.log('✅ Supabase ready');
-            } catch(e) { console.error('Supabase error:', e); }
+        (async function() { 
+            try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); supabaseReady = true; } 
+            catch(e) { console.error(e); }
         })();
 
-        let currentMode = 'login', forgotStep = 0, forgotUsername = '';
+        const currentUser = localStorage.getItem('receiptit_logged_user');
+        if (!currentUser) window.location.href = 'login.html';
 
-        function switchTab(mode) {
-            currentMode = mode; forgotStep = 0;
-            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[onclick*="${mode}"]`).classList.add('active');
-            document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
-            document.getElementById('register-form').style.display = mode === 'register' ? 'block' : 'none';
-            document.getElementById('forgot-form').style.display = mode === 'forgot' ? 'block' : 'none';
-            document.getElementById('error-msg').classList.remove('show');
-            document.getElementById('forgot-section').style.display = 'none';
-            document.getElementById('forgot-new-section').style.display = 'none';
-            document.getElementById('forgot-btn').textContent = 'Vérifier';
+        let state = {
+            points:0,sessions:[],inventory:{},packsOpened:0,totalSessions:0,streak:0,
+            packHistory:[],equippedStickers:[],avatarEmoji:'👤',profilePic:null,
+            followers:[],following:[],userId:'user_'+Math.random().toString(36).substr(2,9)+'_'+Date.now()
+        };
+
+        let ticketImageData = null;
+
+        function cacheState() { localStorage.setItem('receiptit_state_'+currentUser, JSON.stringify(state)); }
+
+        async function saveToDB() {
+            cacheState();
+            if (!supabaseReady) return;
+            try {
+                await supabase.from('receiptit_users').upsert({
+                    user_id:state.userId, username:currentUser, points:state.points,
+                    sessions:state.sessions, inventory:state.inventory,
+                    packs_opened:state.packsOpened, total_sessions:state.totalSessions,
+                    streak:state.streak, pack_history:state.packHistory,
+                    equipped_stickers:state.equippedStickers, avatar_emoji:state.avatarEmoji,
+                    profile_pic:state.profilePic, followers:state.followers,
+                    following:state.following, updated_at:new Date().toISOString()
+                }, {onConflict:'username'});
+            } catch(e) { console.error('Save error:',e); }
         }
 
-        function showError(msg) { const el = document.getElementById('error-msg'); el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 4000); }
-        function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
-
-        function hashPassword(pw, un) {
-            let h = 0; const s = pw + 'rct_salt_' + un;
-            for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h = h & h; }
-            return Math.abs(h).toString(36);
-        }
-
-        function normalize(a) { return a.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' '); }
-
-        async function loginSuccess(username) {
-            localStorage.setItem('receiptit_logged_user', username);
-            if (supabaseReady) {
-                try { await supabase.from('receiptit_users').update({ last_login: new Date().toISOString() }).eq('username', username); } catch(e) {}
-            }
-            window.location.href = 'index.html';
-        }
-
-        // ============ LOGIN ============
-        async function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('login-username').value.trim().toLowerCase();
-            const password = document.getElementById('login-password').value;
-            if (!username || !password) { showError('Remplis tous les champs !'); return; }
-            const hashed = hashPassword(password, username);
-
-            // Supabase
-            if (supabaseReady) {
-                try {
-                    const { data, error } = await supabase.from('receiptit_users').select('*').eq('username', username).single();
-                    if (!error && data) {
-                        if (data.password_hash === hashed) {
-                            await loginSuccess(username);
-                            return;
-                        } else { showError('Mot de passe incorrect !'); return; }
-                    }
-                } catch(err) { console.error(err); }
-            }
-
-            // Fallback localStorage
-            const users = JSON.parse(localStorage.getItem('receiptit_users') || '{}');
-            const user = users[username];
-            if (!user) { showError('Utilisateur introuvable !'); return; }
-            if (user.password !== hashed) { showError('Mot de passe incorrect !'); return; }
-            await loginSuccess(username);
-        }
-
-        // ============ REGISTER ============
-        async function handleRegister(e) {
-            e.preventDefault();
-            const username = document.getElementById('reg-username').value.trim().toLowerCase();
-            const password = document.getElementById('reg-password').value;
-            const confirm = document.getElementById('reg-confirm').value;
-            const question = document.getElementById('reg-question').value;
-            const answer = document.getElementById('reg-answer').value.trim();
-
-            if (!username || !password || !question || !answer) { showError('Remplis tout !'); return; }
-            if (username.length < 2) { showError('Pseudo trop court !'); return; }
-            if (password.length < 4) { showError('Mot de passe trop court !'); return; }
-            if (password !== confirm) { showError('Mots de passe différents !'); return; }
-
-            const hashed = hashPassword(password, username);
-            const normAnswer = normalize(answer);
-            const creationDate = new Date().toLocaleDateString('fr-FR');
-            const userId = 'user_' + Math.random().toString(36).substr(2,9) + '_' + Date.now();
-
-            const userData = {
-                user_id: userId, username: username, password_hash: hashed,
-                security_question: question, security_answer: normAnswer,
-                two_fa_enabled: false, points: 0, sessions: [], inventory: {},
-                packs_opened: 0, total_sessions: 0, streak: 0, pack_history: [],
-                equipped_stickers: [], avatar_emoji: '👤', creation_date: creationDate,
-                last_login: new Date().toISOString(), created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            };
-
-            // Supabase
-            if (supabaseReady) {
-                try {
-                    const { data: exists } = await supabase.from('receiptit_users').select('username').eq('username', username).single();
-                    if (exists) { showError('Ce pseudo existe déjà !'); return; }
-                    const { error } = await supabase.from('receiptit_users').insert(userData);
-                    if (error) { showError('Erreur Supabase: ' + error.message); return; }
-                    await loginSuccess(username);
-                    showToast('🎉 Compte créé !');
-                    return;
-                } catch(err) { console.error(err); }
-            }
-
-            // Fallback localStorage
-            const users = JSON.parse(localStorage.getItem('receiptit_users') || '{}');
-            if (users[username]) { showError('Ce pseudo existe déjà !'); return; }
-            users[username] = { password: hashed, securityQuestion: question, securityAnswer: normAnswer, creationDate, lastLogin: new Date().toISOString() };
-            localStorage.setItem('receiptit_users', JSON.stringify(users));
-            await loginSuccess(username);
-            showToast('🎉 Compte créé !');
-        }
-
-        // ============ FORGOT ============
-        async function handleForgot(e) {
-            e.preventDefault();
-            const username = document.getElementById('forgot-username').value.trim().toLowerCase();
-            if (!username) { showError('Entre ton pseudo !'); return; }
-
-            if (forgotStep === 0) {
-                let user = null;
-                if (supabaseReady) {
-                    try { const { data } = await supabase.from('receiptit_users').select('*').eq('username', username).single(); user = data; } catch(err) {}
+        async function loadFromDB() {
+            if (!supabaseReady) return false;
+            try {
+                const {data,error} = await supabase.from('receiptit_users').select('*').eq('username',currentUser).single();
+                if (!error && data) {
+                    state.points=data.points||0; state.sessions=data.sessions||[];
+                    state.inventory=data.inventory||{}; state.packsOpened=data.packs_opened||0;
+                    state.totalSessions=data.total_sessions||0; state.streak=data.streak||0;
+                    state.packHistory=data.pack_history||[]; state.equippedStickers=data.equipped_stickers||[];
+                    state.avatarEmoji=data.avatar_emoji||'👤'; state.profilePic=data.profile_pic||null;
+                    state.followers=data.followers||[]; state.following=data.following||[];
+                    state.userId=data.user_id||state.userId;
+                    cacheState(); return true;
                 }
-                if (!user) { const users = JSON.parse(localStorage.getItem('receiptit_users')||'{}'); user = users[username]; }
-                if (!user) { showError('Utilisateur introuvable !'); return; }
-                forgotUsername = username; forgotStep = 1;
-                document.getElementById('forgot-section').style.display = 'block';
-                document.getElementById('forgot-question-text').textContent = user.security_question || user.securityQuestion;
-                document.getElementById('forgot-btn').textContent = 'Vérifier';
-                document.getElementById('forgot-username').disabled = true;
-                return;
-            }
-
-            if (forgotStep === 1) {
-                const answer = document.getElementById('forgot-answer').value;
-                if (!answer) { showError('Réponds !'); return; }
-                let user = null;
-                if (supabaseReady) {
-                    try { const { data } = await supabase.from('receiptit_users').select('*').eq('username', forgotUsername).single(); user = data; } catch(err) {}
-                }
-                if (!user) { const users = JSON.parse(localStorage.getItem('receiptit_users')||'{}'); user = users[forgotUsername]; }
-                if (normalize(answer) !== (user.security_answer || user.securityAnswer)) { showError('Réponse incorrecte !'); return; }
-                forgotStep = 2;
-                document.getElementById('forgot-new-section').style.display = 'block';
-                document.getElementById('forgot-btn').textContent = 'Changer le mot de passe';
-                document.getElementById('forgot-answer').disabled = true;
-                return;
-            }
-
-            if (forgotStep === 2) {
-                const pw = document.getElementById('forgot-new-pw').value;
-                const cf = document.getElementById('forgot-new-confirm').value;
-                if (!pw || pw.length < 4) { showError('Trop court !'); return; }
-                if (pw !== cf) { showError('Différents !'); return; }
-                const hashed = hashPassword(pw, forgotUsername);
-                if (supabaseReady) {
-                    try { await supabase.from('receiptit_users').update({ password_hash: hashed, updated_at: new Date().toISOString() }).eq('username', forgotUsername); } catch(e) {}
-                }
-                const users = JSON.parse(localStorage.getItem('receiptit_users')||'{}');
-                if (users[forgotUsername]) { users[forgotUsername].password = hashed; localStorage.setItem('receiptit_users', JSON.stringify(users)); }
-                showToast('🎉 Mot de passe changé !');
-                switchTab('login');
-                document.getElementById('login-username').value = forgotUsername;
-            }
+            } catch(e) { console.error('Load error:',e); }
+            const cached = localStorage.getItem('receiptit_state_'+currentUser);
+            if (cached) { try { state = {...state,...JSON.parse(cached)}; } catch(e) {} }
+            return false;
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('receiptit_logged_user')) window.location.href = 'index.html';
+        function getStreakMultiplier() { return state.streak<=0?1.0:Math.min(1+(state.streak*0.1),3.0); }
+
+        function updateUI() {
+            document.getElementById('nav-points').textContent = state.points;
+            document.getElementById('stat-sessions').textContent = state.totalSessions;
+            document.getElementById('stat-packs').textContent = state.packsOpened;
+            document.getElementById('stat-items').textContent = Object.keys(state.inventory).length;
+            const m = getStreakMultiplier();
+            document.getElementById('streak-count').textContent = state.streak+' jour'+(state.streak>1?'s':'')+(m>1?' (×'+m.toFixed(1)+')':'');
+            document.getElementById('welcome-name').textContent = 'Salut '+currentUser+' ! 👋';
+
+            const list = document.getElementById('session-list');
+            const recent = state.sessions.slice(-10).reverse();
+            if (!recent.length) { list.innerHTML='<div class="empty-state"><div class="empty-icon">📝</div><p>Aucune session.</p></div>'; return; }
+            list.innerHTML = recent.map(s=>{
+                let ic='work',icon='⏱️';
+                if(s.type==='lesson'){ic='lesson';icon='📚';}
+                if(s.type==='exercise'){ic='exercise';icon='✏️';}
+                if(s.type==='pomodoro'){ic='pomodoro';icon='⏱️';}
+                let meta=s.time||''; if(s.subject)meta+=' · '+s.subject;
+                return `<div class="session-item"><div class="session-icon ${ic}">${icon}</div><div class="session-info"><div class="session-title">${s.label||'Session'}</div><div class="session-meta">${meta}</div></div><div class="session-points ${s.points<0?'negative':''}">${s.points>0?'+':''}${s.points} pts</div></div>`;
+            }).join('');
+        }
+
+        function showTicket() {
+            const today = new Date().toDateString();
+            const ts = state.sessions.filter(s=>{try{return new Date(s.date).toDateString()===today}catch(e){return false}});
+            const lessons=ts.filter(s=>s.type==='lesson'), exercises=ts.filter(s=>s.type==='exercise'), pomodoros=ts.filter(s=>s.type==='pomodoro');
+            const packs=state.packHistory.filter(p=>{try{return new Date(p.time||p.date).toDateString()===today}catch(e){return false}});
+            const earned=ts.reduce((s,x)=>s+(x.points>0?x.points:0),0), spent=packs.length*100;
+            const data={lessons,exercises,pomodoros,packs,totalEarned:earned,totalSpent:spent};
+
+            const c=document.getElementById('ticket-canvas'),ctx=c.getContext('2d');
+            const W=360,P=20; let y=20;
+            const h=250+lessons.length*25+exercises.length*25+pomodoros.length*25+packs.length*25;
+            c.width=W; c.height=Math.min(h,600);
+            ctx.fillStyle='#fff';ctx.fillRect(0,0,W,c.height);
+            ctx.strokeStyle='#e2e8f0';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.strokeRect(6,6,W-12,c.height-12);ctx.setLineDash([]);
+            ctx.fillStyle='#2d2b55';ctx.font='bold 20px "Space Mono",monospace';ctx.textAlign='center';
+            ctx.fillText('🧾 RECEIPTIT',W/2,y+18);y+=35;
+            ctx.font='13px "Outfit",sans-serif';ctx.fillStyle='#7a78a8';ctx.fillText('Ticket du jour',W/2,y);y+=18;
+            ctx.fillText('📅 '+new Date().toLocaleDateString('fr-FR'),W/2,y);y+=25;
+            ctx.strokeStyle='#8b5cf6';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(P,y);ctx.lineTo(W-P,y);ctx.stroke();y+=18;
+            ctx.textAlign='left';ctx.fillStyle='#2d2b55';
+
+            function drawSection(title,items,pfn){
+                if(!items.length)return;
+                ctx.font='bold 12px "Outfit",sans-serif';ctx.fillText(title,P,y);y+=20;
+                ctx.font='11px "Space Mono",monospace';
+                items.forEach(i=>{ctx.fillText('• '+(i.lessonName||i.exerciseName||i.label||'Focus'),P+8,y);ctx.fillStyle='#34d399';ctx.fillText('+'+pfn(i)+' pts',W-P-55,y);ctx.fillStyle='#2d2b55';y+=20;});
+                y+=6;
+            }
+            drawSection('📚 LEÇONS',lessons,l=>l.points);
+            drawSection('✏️ EXERCICES',exercises,ex=>ex.points);
+            drawSection('⏱️ POMODOROS',pomodoros,p=>p.points);
+            if(packs.length){ctx.font='bold 12px "Outfit",sans-serif';ctx.fillText('🎁 PACKS',P,y);y+=20;ctx.font='11px "Space Mono",monospace';packs.forEach(p=>{ctx.fillText('• '+p.name+' ('+(p.rarity||'?')+')',P+8,y);ctx.fillStyle='#f87171';ctx.fillText('-100 pts',W-P-55,y);ctx.fillStyle='#2d2b55';y+=20;});y+=6;}
+
+            ctx.strokeStyle='#8b5cf6';ctx.beginPath();ctx.moveTo(P,y);ctx.lineTo(W-P,y);ctx.stroke();y+=16;
+            ctx.font='bold 13px "Outfit",sans-serif';ctx.fillStyle='#34d399';ctx.fillText('💰 Gagnés : +'+earned+' pts',P,y);y+=20;
+            ctx.fillStyle='#f87171';ctx.fillText('💸 Dépensés : -'+spent+' pts',P,y);y+=20;
+            const bal=earned-spent;ctx.fillStyle=bal>=0?'#34d399':'#f87171';ctx.fillText('⭐ Solde : '+(bal>=0?'+':'')+bal+' pts',P,y);ctx.fillStyle='#2d2b55';y+=20;
+            ctx.fillText('🔥 Streak : '+state.streak+'j (×'+getStreakMultiplier().toFixed(1)+')',P,y);y+=20;
+            ctx.fillText('🧾 Total : '+state.points+' pts',P,y);y+=25;
+            ctx.textAlign='center';ctx.font='italic 11px "Outfit",sans-serif';ctx.fillStyle='#a8a6c8';
+            ctx.fillText('Merci d\'avoir bossé ! 💪',W/2,y);y+=16;
+            ctx.fillText('RECEIPTIT - Ton taff en ticket 🧾',W/2,y);
+            ticketImageData=c.toDataURL('image/png');
+
+            document.getElementById('ticket-modal').classList.add('active');
+            const pp=document.getElementById('printer-paper');pp.style.animation='none';pp.offsetHeight;pp.style.animation='paperSlide 1.5s ease-out forwards';
+        }
+
+        function closeTicket() { document.getElementById('ticket-modal').classList.remove('active'); }
+
+        async function shareTicket() {
+            if(!ticketImageData)return;
+            const blob=await(await fetch(ticketImageData)).blob();
+            const file=new File([blob],'ticket.png',{type:'image/png'});
+            if(navigator.share&&navigator.canShare({files:[file]})){await navigator.share({title:'🧾 Ticket',files:[file]});}
+            else{await navigator.clipboard.writeText('🧾 Ticket Receiptit');showToast('📋 Copié !');}
+        }
+
+        function printTicket() {
+            const c=document.getElementById('ticket-canvas');
+            const w=window.open('','_blank');w.document.write('<img src="'+c.toDataURL()+'">');w.print();
+        }
+
+        function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500); }
+
+        document.addEventListener('DOMContentLoaded', async ()=>{
+            const loaded=await loadFromDB();
+            if(!loaded){ const c=localStorage.getItem('receiptit_state_'+currentUser); if(c)try{state={...state,...JSON.parse(c)};}catch(e){} }
+            updateUI();
+            if(localStorage.getItem('receiptit_show_ticket_'+currentUser)==='true'){setTimeout(showTicket,600);localStorage.setItem('receiptit_show_ticket_'+currentUser,'false');}
         });
+
+        document.getElementById('ticket-modal').addEventListener('click',e=>{if(e.target.id==='ticket-modal')closeTicket();});
     </script>
 </body>
 </html>
