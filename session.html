@@ -15,38 +15,25 @@
     <nav class="navbar">
         <div class="navbar-brand" onclick="window.location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
         <div class="navbar-actions">
-            <a href="inventory.html" class="navbar-link" title="Inventaire">🎒</a>
-            <a href="sticker-world.html" class="navbar-link" title="Sticker World">🌍</a>
-            <a href="friends.html" class="navbar-link" title="Amis">👥</a>
-            <a href="trades.html" class="navbar-link" title="Échanges">🔄</a>
+            <a href="inventory.html" class="navbar-link">🎒</a>
+            <a href="sticker-world.html" class="navbar-link">🌍</a>
+            <a href="friends.html" class="navbar-link">👥</a>
+            <a href="trades.html" class="navbar-link">🔄</a>
             <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
         </div>
     </nav>
 
     <div class="main-content">
-        <div class="step-bar" id="step-bar">
-            <div class="step-dot active" data-step="1"></div>
-            <div class="step-dot" data-step="2"></div>
-            <div class="step-dot" data-step="3"></div>
-            <div class="step-dot" data-step="4"></div>
-        </div>
+        <div class="step-bar"><div class="step-dot active" data-step="1"></div><div class="step-dot" data-step="2"></div><div class="step-dot" data-step="3"></div><div class="step-dot" data-step="4"></div></div>
 
-        <!-- STEP 1 -->
-        <div class="card" id="step-1">
-            <h2>🎯 Quel type de session ?</h2>
+        <div class="card" id="step-1"><h2>🎯 Quel type de session ?</h2>
             <div class="type-grid">
-                <div class="type-card" data-type="lesson" data-points="50" onclick="selectType(this)">
-                    <span class="type-icon">📚</span><div class="type-name">Leçon</div><div class="type-points">+50 pts</div>
-                </div>
-                <div class="type-card" data-type="exercise" data-points="10" onclick="selectType(this)">
-                    <span class="type-icon">✏️</span><div class="type-name">Exercice</div><div class="type-points">+10 pts/exo</div>
-                </div>
+                <div class="type-card" data-type="lesson" data-points="50" onclick="selectType(this)"><span class="type-icon">📚</span><div class="type-name">Leçon</div><div class="type-points">+50 pts</div></div>
+                <div class="type-card" data-type="exercise" data-points="10" onclick="selectType(this)"><span class="type-icon">✏️</span><div class="type-name">Exercice</div><div class="type-points">+10 pts/exo</div></div>
             </div>
         </div>
 
-        <!-- STEP 2 -->
-        <div class="card" id="step-2" style="display:none;">
-            <h2>📚 Quelle matière ?</h2>
+        <div class="card" id="step-2" style="display:none;"><h2>📚 Quelle matière ?</h2>
             <div class="subject-grid">
                 <div class="subject-chip" data-subject="Maths" onclick="selectSubject(this)"><span class="chip-icon">📐</span>Maths</div>
                 <div class="subject-chip" data-subject="Physique" onclick="selectSubject(this)"><span class="chip-icon">⚛️</span>Physique</div>
@@ -58,54 +45,36 @@
                 <div class="subject-chip" data-subject="Info" onclick="selectSubject(this)"><span class="chip-icon">💻</span>Info</div>
                 <div class="subject-chip" data-subject="Philosophie" onclick="selectSubject(this)"><span class="chip-icon">🤔</span>Philo</div>
             </div>
-            <div class="custom-subject">
-                <input type="text" id="custom-subject-input" placeholder="Autre matière..." maxlength="20">
-                <button onclick="addCustomSubject()">OK</button>
-            </div>
-            <div class="nav-buttons">
-                <button class="nav-btn" onclick="goToStep(1)">← Retour</button>
-                <button class="nav-btn" onclick="goToStep(3)">Continuer →</button>
-            </div>
+            <div class="custom-subject"><input type="text" id="custom-subject" placeholder="Autre..." maxlength="20"><button onclick="addCustomSubject()">OK</button></div>
+            <div class="nav-buttons"><button class="nav-btn" onclick="goToStep(1)">←</button><button class="nav-btn" onclick="goToStep(3)">→</button></div>
         </div>
 
-        <!-- STEP 3 -->
-        <div class="card" id="step-3" style="display:none;">
-            <h2>📝 Détails</h2>
+        <div class="card" id="step-3" style="display:none;"><h2>📝 Détails</h2>
             <div id="lesson-details">
                 <div class="input-group"><label>Nom de la leçon</label><input type="text" id="lesson-name" placeholder="Ex: Dérivées..." maxlength="60"></div>
-                <div class="input-group"><label>Notes (optionnel)</label><textarea id="lesson-notes" placeholder="Ce que tu as retenu..." maxlength="500"></textarea></div>
+                <div class="input-group"><label>Notes</label><textarea id="lesson-notes" placeholder="Ce que tu as retenu..." maxlength="500"></textarea></div>
                 <div class="input-group"><label>📊 Compréhension</label>
                     <div class="comprehension-grid">
-                        <div class="comp-card" data-level="not-understood" onclick="selectComp(this)"><span class="comp-emoji">😵‍💫</span><div class="comp-label">Pas compris</div></div>
-                        <div class="comp-card" data-level="needs-work" onclick="selectComp(this)"><span class="comp-emoji">🤔</span><div class="comp-label">À revoir</div></div>
-                        <div class="comp-card" data-level="understood" onclick="selectComp(this)"><span class="comp-emoji">😎</span><div class="comp-label">Compris !</div></div>
+                        <div class="comp-card" data-level="not" onclick="selectComp(this)"><span class="comp-emoji">😵‍💫</span><div class="comp-label">Pas compris</div></div>
+                        <div class="comp-card" data-level="review" onclick="selectComp(this)"><span class="comp-emoji">🤔</span><div class="comp-label">À revoir</div></div>
+                        <div class="comp-card" data-level="ok" onclick="selectComp(this)"><span class="comp-emoji">😎</span><div class="comp-label">Compris !</div></div>
                     </div>
                 </div>
             </div>
             <div id="exercise-details" style="display:none;">
-                <div class="input-group"><label>Nom de la série</label><input type="text" id="exercise-name" placeholder="Ex: Série 3 page 42..." maxlength="60"></div>
-                <div class="input-group"><label>Notes (optionnel)</label><textarea id="exercise-notes" placeholder="Difficultés..." maxlength="500"></textarea></div>
+                <div class="input-group"><label>Nom de la série</label><input type="text" id="exercise-name" placeholder="Ex: Série 3..." maxlength="60"></div>
+                <div class="input-group"><label>Notes</label><textarea id="exercise-notes" placeholder="Difficultés..." maxlength="500"></textarea></div>
                 <div class="input-group"><label>Nombre d'exercices</label>
-                    <div class="count-selector">
-                        <button class="count-btn" onclick="changeCount(-1)">−</button>
-                        <div class="count-display" id="exercise-count">1</div>
-                        <button class="count-btn" onclick="changeCount(1)">+</button>
-                    </div>
-                    <div class="count-label">exercice<span id="exo-plural">s</span></div>
+                    <div class="count-selector"><button class="count-btn" onclick="changeCount(-1)">−</button><div class="count-display" id="exercise-count">1</div><button class="count-btn" onclick="changeCount(1)">+</button></div>
                 </div>
-                <div class="related-section"><h4>🔗 Lié à une leçon (optionnel)</h4><div class="related-list" id="related-lessons"></div></div>
+                <div class="related-section"><h4>🔗 Lié à une leçon</h4><div class="related-list" id="related-lessons"></div></div>
             </div>
-            <div class="nav-buttons">
-                <button class="nav-btn" onclick="goToStep(2)">← Retour</button>
-                <button class="nav-btn" onclick="goToStep(4)">Continuer →</button>
-            </div>
+            <div class="nav-buttons"><button class="nav-btn" onclick="goToStep(2)">←</button><button class="nav-btn" onclick="goToStep(4)">→</button></div>
         </div>
 
-        <!-- STEP 4 -->
-        <div class="card" id="step-4" style="display:none;">
-            <h2>✅ Récapitulatif</h2>
+        <div class="card" id="step-4" style="display:none;"><h2>✅ Récapitulatif</h2>
             <div id="recap-content" style="margin-bottom:20px;font-size:0.9rem;line-height:1.8;"></div>
-            <button class="btn-primary" id="submit-btn" onclick="submitSession()"><span>✨</span><span>Valider la session</span></button>
+            <button class="btn-primary" id="submit-btn" onclick="submitSession()"><span>✨</span><span>Valider</span></button>
             <div class="nav-buttons"><button class="nav-btn" onclick="goToStep(3)">← Modifier</button></div>
         </div>
     </div>
@@ -118,149 +87,112 @@
         <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
     </nav>
 
-    <div class="success-overlay" id="success-overlay">
-        <span class="success-emoji">🎉</span><div class="success-text">Session enregistrée !</div>
-        <div class="success-points" id="success-points">+50 pts</div>
-        <button class="success-btn" onclick="closeSuccess()">Continuer</button>
-    </div>
-
+    <div class="success-overlay" id="success-overlay"><span class="success-emoji">🎉</span><div class="success-text">Session enregistrée !</div><div class="success-points" id="success-points">+50 pts</div><button class="success-btn" onclick="closeSuccess()">Continuer</button></div>
     <div class="toast" id="toast"></div>
 
     <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
     <script>
-        const SUPABASE_URL = CONFIG.SUPABASE_URL;
-        const SUPABASE_KEY = CONFIG.SUPABASE_KEY;
+        const SUPABASE_URL = CONFIG.SUPABASE_URL, SUPABASE_KEY = CONFIG.SUPABASE_KEY;
         let supabase = null, supabaseReady = false;
         (async function(){ try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); supabaseReady = true; } catch(e) {} })();
 
         const currentUser = localStorage.getItem('receiptit_logged_user');
         if (!currentUser) window.location.href = 'login.html';
 
-        let state = {
-            points: 0, sessions: [], inventory: {}, packsOpened: 0,
-            totalSessions: 0, streak: 0, packHistory: [],
-            equippedStickers: [], avatarEmoji: '👤', followers: [], following: [],
-            userId: localStorage.getItem('receiptit_user_id') || 'user_' + Math.random().toString(36).substr(2,9)
-        };
+        let state = { points:0,sessions:[],inventory:{},packsOpened:0,totalSessions:0,streak:0,packHistory:[],equippedStickers:[],avatarEmoji:'👤',profilePic:null,followers:[],following:[],userId:'user_'+Math.random().toString(36).substr(2,9)+'_'+Date.now() };
+        let sessionData = { type:null,points:0,subject:null,lessonName:'',lessonNotes:'',comprehension:null,exerciseName:'',exerciseNotes:'',exerciseCount:1,relatedLessons:[] };
+        let currentStep = 1;
 
-        let sessionData = { type: null, points: 0, subject: null, lessonName: '', lessonNotes: '', comprehension: null, exerciseName: '', exerciseNotes: '', exerciseCount: 1, relatedLessons: [] };
+        function cacheState() { localStorage.setItem('receiptit_state_'+currentUser, JSON.stringify(state)); }
+        async function saveToDB() { cacheState(); if (!supabaseReady) return; try { await supabase.from('receiptit_users').upsert({ user_id:state.userId,username:currentUser,points:state.points,sessions:state.sessions,inventory:state.inventory,packs_opened:state.packsOpened,total_sessions:state.totalSessions,streak:state.streak,pack_history:state.packHistory,equipped_stickers:state.equippedStickers,avatar_emoji:state.avatarEmoji,profile_pic:state.profilePic,followers:state.followers,following:state.following,updated_at:new Date().toISOString() },{onConflict:'username'}); } catch(e) {} }
+        async function loadFromDB() { if (!supabaseReady) return false; try { const {data,error} = await supabase.from('receiptit_users').select('*').eq('username',currentUser).single(); if (!error && data) { state.points=data.points||0; state.sessions=data.sessions||[]; state.inventory=data.inventory||{}; state.packsOpened=data.packs_opened||0; state.totalSessions=data.total_sessions||0; state.streak=data.streak||0; state.packHistory=data.pack_history||[]; state.equippedStickers=data.equipped_stickers||[]; state.avatarEmoji=data.avatar_emoji||'👤'; state.profilePic=data.profile_pic||null; state.followers=data.followers||[]; state.following=data.following||[]; state.userId=data.user_id||state.userId; cacheState(); return true; } } catch(e) {} const c=localStorage.getItem('receiptit_state_'+currentUser); if(c) try{state={...state,...JSON.parse(c)};}catch(e){} return false; }
 
-        function saveLocal() { localStorage.setItem('receiptit_state_' + currentUser, JSON.stringify(state)); }
-        function loadLocal() { const s = localStorage.getItem('receiptit_state_' + currentUser); if (s) try { state = { ...state, ...JSON.parse(s) }; } catch(e) {} }
-
-        function getStreakMultiplier() { return state.streak <= 0 ? 1.0 : Math.min(1 + (state.streak * 0.1), 3.0); }
-
+        function getStreakMultiplier() { return state.streak<=0?1.0:Math.min(1+(state.streak*0.1),3.0); }
         function calculateStreak() {
-            const sessions = state.sessions;
-            if (!sessions.length) return 0;
-            const dates = [...new Set(sessions.map(s => new Date(s.date).toDateString()))].sort((a,b) => new Date(b) - new Date(a));
-            const today = new Date().toDateString(), yesterday = new Date(Date.now() - 86400000).toDateString();
-            if (dates[0] !== today && dates[0] !== yesterday) return 0;
-            let streak = 0, check = new Date(dates[0]);
-            for (const d of dates) {
-                if (d === check.toDateString()) { streak++; check.setDate(check.getDate() - 1); }
-                else if (streak === 0 && d === yesterday) { streak++; check.setDate(check.getDate() - 1); }
-                else break;
-            }
+            const sessions=state.sessions; if(!sessions.length)return 0;
+            const dates=[...new Set(sessions.map(s=>new Date(s.date).toDateString()))].sort((a,b)=>new Date(b)-new Date(a));
+            const today=new Date().toDateString(),yesterday=new Date(Date.now()-86400000).toDateString();
+            if(dates[0]!==today&&dates[0]!==yesterday)return 0;
+            let streak=0,check=new Date(dates[0]);
+            for(const d of dates){if(d===check.toDateString()){streak++;check.setDate(check.getDate()-1);}else if(streak===0&&d===yesterday){streak++;check.setDate(check.getDate()-1);}else break;}
             return streak;
         }
 
-        let currentStep = 1;
         function goToStep(step) {
-            if (step === 2 && !sessionData.type) { showToast('⚠️ Choisis un type !'); return; }
-            if (step === 3 && !sessionData.subject) { showToast('⚠️ Choisis une matière !'); return; }
-            if (step === 4) {
-                if (sessionData.type === 'lesson') { sessionData.lessonName = document.getElementById('lesson-name')?.value?.trim() || ''; if (!sessionData.lessonName) { showToast('⚠️ Donne un nom à ta leçon !'); return; } }
-                if (sessionData.type === 'exercise') { sessionData.exerciseName = document.getElementById('exercise-name')?.value?.trim() || ''; if (!sessionData.exerciseName) { showToast('⚠️ Donne un nom à ton exercice !'); return; } }
+            if(step===2&&!sessionData.type){showToast('⚠️ Choisis un type !');return;}
+            if(step===3&&!sessionData.subject){showToast('⚠️ Choisis une matière !');return;}
+            if(step===4){
+                if(sessionData.type==='lesson'){sessionData.lessonName=document.getElementById('lesson-name')?.value?.trim()||'';if(!sessionData.lessonName){showToast('⚠️ Nom de leçon !');return;}}
+                if(sessionData.type==='exercise'){sessionData.exerciseName=document.getElementById('exercise-name')?.value?.trim()||'';if(!sessionData.exerciseName){showToast('⚠️ Nom d\'exercice !');return;}}
                 updateRecap();
             }
-            currentStep = step;
-            for (let i = 1; i <= 4; i++) { const el = document.getElementById('step-' + i); if (el) el.style.display = 'none'; }
-            const target = document.getElementById('step-' + step);
-            if (target) { target.style.display = 'block'; target.style.animation = 'none'; target.offsetHeight; target.style.animation = 'slideUp 0.3s ease-out'; }
-            document.querySelectorAll('.step-dot').forEach((dot, idx) => { dot.classList.remove('active', 'done'); if (idx + 1 < step) dot.classList.add('done'); if (idx + 1 === step) dot.classList.add('active'); });
-            if (step === 3) {
-                document.getElementById('lesson-details').style.display = sessionData.type === 'lesson' ? 'block' : 'none';
-                document.getElementById('exercise-details').style.display = sessionData.type === 'lesson' ? 'none' : 'block';
-                if (sessionData.type === 'exercise') {
-                    const lessons = state.sessions.filter(s => s.type === 'lesson' && s.lessonName).map(s => s.lessonName).filter((v,i,a) => a.indexOf(v) === i).slice(-10);
-                    const container = document.getElementById('related-lessons');
-                    container.innerHTML = lessons.length ? lessons.map(l => `<div class="related-tag" onclick="this.classList.toggle('active');sessionData.relatedLessons=this.classList.contains('active')?[...sessionData.relatedLessons,'${l.replace(/'/g,"\\'")}']:sessionData.relatedLessons.filter(x=>x!=='${l.replace(/'/g,"\\'")}')">${l}</div>`).join('') : '<span style="color:var(--text-light);font-size:0.8rem;">Aucune leçon</span>';
-                }
-            }
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            currentStep=step;
+            for(let i=1;i<=4;i++){const el=document.getElementById('step-'+i);if(el)el.style.display='none';}
+            const target=document.getElementById('step-'+step);if(target){target.style.display='block';target.scrollIntoView({behavior:'smooth'});}
+            document.querySelectorAll('.step-dot').forEach((dot,idx)=>{dot.classList.remove('active','done');if(idx+1<step)dot.classList.add('done');if(idx+1===step)dot.classList.add('active');});
+            if(step===3){document.getElementById('lesson-details').style.display=sessionData.type==='lesson'?'block':'none';document.getElementById('exercise-details').style.display=sessionData.type==='lesson'?'none':'block';
+                if(sessionData.type==='exercise'){const lessons=state.sessions.filter(s=>s.type==='lesson'&&s.lessonName).map(s=>s.lessonName).filter((v,i,a)=>a.indexOf(v)===i).slice(-10);document.getElementById('related-lessons').innerHTML=lessons.length?lessons.map(l=>`<div class="related-tag" onclick="this.classList.toggle('active')">${l}</div>`).join(''):'<span style="color:var(--text-light);">Aucune leçon</span>';}}
         }
 
-        function selectType(card) { document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active')); card.classList.add('active'); sessionData.type = card.dataset.type; sessionData.points = parseInt(card.dataset.points); setTimeout(() => goToStep(2), 300); }
-        function selectSubject(chip) { document.querySelectorAll('.subject-chip').forEach(c => c.classList.remove('active')); chip.classList.add('active'); sessionData.subject = chip.dataset.subject; }
-        function addCustomSubject() { const v = document.getElementById('custom-subject-input').value.trim(); if (!v) { showToast('⚠️ Écris une matière !'); return; } sessionData.subject = v; document.querySelectorAll('.subject-chip').forEach(c => c.classList.remove('active')); document.getElementById('custom-subject-input').value = ''; showToast('✅ ' + v); }
-        function selectComp(card) { document.querySelectorAll('.comp-card').forEach(c => c.classList.remove('active')); card.classList.add('active'); sessionData.comprehension = card.dataset.level; }
-        function changeCount(d) { sessionData.exerciseCount = Math.max(1, Math.min(50, sessionData.exerciseCount + d)); document.getElementById('exercise-count').textContent = sessionData.exerciseCount; document.getElementById('exo-plural').textContent = sessionData.exerciseCount > 1 ? 's' : ''; }
+        function selectType(card){document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('active'));card.classList.add('active');sessionData.type=card.dataset.type;sessionData.points=parseInt(card.dataset.points);setTimeout(()=>goToStep(2),300);}
+        function selectSubject(chip){document.querySelectorAll('.subject-chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');sessionData.subject=chip.dataset.subject;}
+        function addCustomSubject(){const v=document.getElementById('custom-subject').value.trim();if(!v){showToast('⚠️ Écris une matière !');return;}sessionData.subject=v;document.querySelectorAll('.subject-chip').forEach(c=>c.classList.remove('active'));showToast('✅ '+v);}
+        function selectComp(card){document.querySelectorAll('.comp-card').forEach(c=>c.classList.remove('active'));card.classList.add('active');sessionData.comprehension=card.dataset.level;}
+        function changeCount(d){sessionData.exerciseCount=Math.max(1,Math.min(50,sessionData.exerciseCount+d));document.getElementById('exercise-count').textContent=sessionData.exerciseCount;}
 
-        function updateRecap() {
-            const mult = getStreakMultiplier();
-            let html = `<strong>${sessionData.type==='lesson'?'📚 Leçon':'✏️ Exercice'}</strong> — ${sessionData.subject}<br>`;
-            if (sessionData.type === 'lesson') {
-                html += `<strong>Leçon:</strong> ${sessionData.lessonName}<br>`;
-                if (sessionData.lessonNotes) html += `<strong>Notes:</strong> ${sessionData.lessonNotes}<br>`;
-                if (sessionData.comprehension) html += `<strong>Compréhension:</strong> ${{'not-understood':'😵‍💫 Pas compris','needs-work':'🤔 À revoir','understood':'😎 Compris !'}[sessionData.comprehension]}<br>`;
-                const fp = Math.round(sessionData.points * mult);
-                html += mult > 1 ? `<strong>Points:</strong> ${sessionData.points} × ${mult.toFixed(1)} = <strong style="color:var(--success);">+${fp} pts</strong>` : `<strong>Points:</strong> +${sessionData.points} pts`;
-            } else {
-                html += `<strong>Exercice:</strong> ${sessionData.exerciseName}<br><strong>Nombre:</strong> ${sessionData.exerciseCount} exo${sessionData.exerciseCount>1?'s':''}<br>`;
-                if (sessionData.exerciseNotes) html += `<strong>Notes:</strong> ${sessionData.exerciseNotes}<br>`;
-                if (sessionData.relatedLessons.length) html += `<strong>Lié à:</strong> ${sessionData.relatedLessons.join(', ')}<br>`;
-                const bp = sessionData.points * sessionData.exerciseCount, fp = Math.round(bp * mult);
-                html += mult > 1 ? `<strong>Points:</strong> ${bp} × ${mult.toFixed(1)} = <strong style="color:var(--success);">+${fp} pts</strong>` : `<strong>Points:</strong> +${bp} pts`;
+        function updateRecap(){
+            const mult=getStreakMultiplier();
+            let html=`<strong>${sessionData.type==='lesson'?'📚 Leçon':'✏️ Exercice'}</strong> — ${sessionData.subject}<br>`;
+            if(sessionData.type==='lesson'){
+                html+=`<strong>Leçon:</strong> ${sessionData.lessonName}<br>`;
+                if(sessionData.lessonNotes)html+=`<strong>Notes:</strong> ${sessionData.lessonNotes}<br>`;
+                if(sessionData.comprehension)html+=`<strong>Compréhension:</strong> ${{'not':'😵‍💫','review':'🤔','ok':'😎'}[sessionData.comprehension]}<br>`;
+                const fp=Math.round(sessionData.points*mult);
+                html+=mult>1?`<strong>Points:</strong> ${sessionData.points}×${mult.toFixed(1)}=<strong style="color:var(--success);">+${fp} pts</strong>`:`<strong>Points:</strong> +${sessionData.points} pts`;
+            }else{
+                html+=`<strong>Exercice:</strong> ${sessionData.exerciseName}<br><strong>Nombre:</strong> ${sessionData.exerciseCount}<br>`;
+                if(sessionData.exerciseNotes)html+=`<strong>Notes:</strong> ${sessionData.exerciseNotes}<br>`;
+                const bp=sessionData.points*sessionData.exerciseCount,fp=Math.round(bp*mult);
+                html+=mult>1?`<strong>Points:</strong> ${bp}×${mult.toFixed(1)}=<strong style="color:var(--success);">+${fp} pts</strong>`:`<strong>Points:</strong> +${bp} pts`;
             }
-            if (state.streak > 0) html += `<br><span style="color:var(--warning);">🔥 Streak ${state.streak}j → ×${mult.toFixed(1)}</span>`;
-            document.getElementById('recap-content').innerHTML = html;
+            if(state.streak>0)html+=`<br><span style="color:var(--warning);">🔥 Streak ${state.streak}j → ×${mult.toFixed(1)}</span>`;
+            document.getElementById('recap-content').innerHTML=html;
         }
 
-        function submitSession() {
-            const btn = document.getElementById('submit-btn'); if (!btn || btn.disabled) return;
-            btn.disabled = true; btn.innerHTML = '<span>⏳</span><span>Enregistrement...</span>';
-            if (sessionData.type === 'lesson') { sessionData.lessonName = document.getElementById('lesson-name')?.value?.trim() || ''; sessionData.lessonNotes = document.getElementById('lesson-notes')?.value?.trim() || ''; }
-            else { sessionData.exerciseName = document.getElementById('exercise-name')?.value?.trim() || ''; sessionData.exerciseNotes = document.getElementById('exercise-notes')?.value?.trim() || ''; }
-            const mult = getStreakMultiplier();
-            let pts = sessionData.type === 'lesson' ? sessionData.points : sessionData.points * sessionData.exerciseCount;
-            const finalPts = Math.round(pts * mult);
-            state.points += finalPts; state.totalSessions++;
-            state.sessions.push({
-                type: sessionData.type, label: sessionData.type === 'lesson' ? sessionData.lessonName : sessionData.exerciseName,
-                points: finalPts, basePoints: pts, multiplier: mult,
-                time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-                subject: sessionData.subject, lessonName: sessionData.type==='lesson'?sessionData.lessonName:null,
-                lessonNotes: sessionData.type==='lesson'?sessionData.lessonNotes||null:null,
-                comprehension: sessionData.type==='lesson'?sessionData.comprehension:null,
-                exerciseName: sessionData.type==='exercise'?sessionData.exerciseName:null,
-                exerciseNotes: sessionData.type==='exercise'?sessionData.exerciseNotes||null:null,
-                exerciseCount: sessionData.type==='exercise'?sessionData.exerciseCount:null,
-                relatedLessons: sessionData.type==='exercise'?sessionData.relatedLessons:null,
-                date: new Date().toISOString()
-            });
-            state.streak = calculateStreak(); saveLocal();
-            document.getElementById('success-points').textContent = '+' + finalPts + ' pts' + (mult > 1 ? ' (×' + mult.toFixed(1) + ' 🔥)' : '');
+        async function submitSession(){
+            const btn=document.getElementById('submit-btn');if(!btn||btn.disabled)return;btn.disabled=true;btn.innerHTML='<span>⏳</span><span>...</span>';
+            const mult=getStreakMultiplier();
+            let pts=sessionData.type==='lesson'?sessionData.points:sessionData.points*sessionData.exerciseCount;
+            const finalPts=Math.round(pts*mult);
+            state.points+=finalPts;state.totalSessions++;
+            state.sessions.push({type:sessionData.type,label:sessionData.type==='lesson'?sessionData.lessonName:sessionData.exerciseName,points:finalPts,basePoints:pts,multiplier:mult,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),subject:sessionData.subject,date:new Date().toISOString()});
+            state.streak=calculateStreak();
+            await saveToDB();
+            document.getElementById('success-points').textContent='+'+finalPts+' pts'+(mult>1?' (×'+mult.toFixed(1)+' 🔥)':'');
             document.getElementById('success-overlay').classList.add('active');
-            document.getElementById('nav-points').textContent = state.points;
+            document.getElementById('nav-points').textContent=state.points;
         }
 
-        function closeSuccess() {
+        function closeSuccess(){
             document.getElementById('success-overlay').classList.remove('active');
-            sessionData = { type: null, points: 0, subject: null, lessonName: '', lessonNotes: '', comprehension: null, exerciseName: '', exerciseNotes: '', exerciseCount: 1, relatedLessons: [] };
-            document.querySelectorAll('.type-card,.subject-chip,.comp-card,.related-tag').forEach(el => el.classList.remove('active'));
-            document.getElementById('lesson-name').value = ''; document.getElementById('lesson-notes').value = '';
-            document.getElementById('exercise-name').value = ''; document.getElementById('exercise-notes').value = '';
-            document.getElementById('exercise-count').textContent = '1'; document.getElementById('exo-plural').textContent = 's';
-            const btn = document.getElementById('submit-btn'); if (btn) { btn.disabled = false; btn.innerHTML = '<span>✨</span><span>Valider la session</span>'; }
+            sessionData={type:null,points:0,subject:null,lessonName:'',lessonNotes:'',comprehension:null,exerciseName:'',exerciseNotes:'',exerciseCount:1,relatedLessons:[]};
+            document.querySelectorAll('.type-card,.subject-chip,.comp-card,.related-tag').forEach(el=>el.classList.remove('active'));
+            document.getElementById('lesson-name').value='';document.getElementById('lesson-notes').value='';
+            document.getElementById('exercise-name').value='';document.getElementById('exercise-notes').value='';
+            document.getElementById('exercise-count').textContent='1';
+            const btn=document.getElementById('submit-btn');if(btn){btn.disabled=false;btn.innerHTML='<span>✨</span><span>Valider</span>';}
             goToStep(1);
         }
 
-        function updatePointsDisplay() { document.getElementById('nav-points').textContent = state.points; }
-        function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+        function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-        document.addEventListener('DOMContentLoaded', () => { loadLocal(); updatePointsDisplay(); goToStep(1); });
+        document.addEventListener('DOMContentLoaded',async()=>{
+            const loaded=await loadFromDB();
+            if(!loaded){const c=localStorage.getItem('receiptit_state_'+currentUser);if(c)try{state={...state,...JSON.parse(c)};}catch(e){}}
+            document.getElementById('nav-points').textContent=state.points;
+            goToStep(1);
+        });
     </script>
 </body>
 </html>
