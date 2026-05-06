@@ -6,6 +6,15 @@
     <title>Receiptit - Sticker World</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .collapsible-header { display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 16px;background:linear-gradient(135deg,var(--accent-pale),white);border-radius:14px;border:2px solid var(--accent);margin-bottom:8px; }
+        .collapsible-body { display:none;padding:0 8px 8px; }
+        .collapsible-body.open { display:block; }
+        .sw-grid { display:grid;grid-template-columns:repeat(6,1fr);gap:6px; }
+        .sw-item { text-align:center;font-size:1.8rem;padding:8px;background:rgba(139,92,246,0.06);border-radius:10px;cursor:pointer;position:relative; }
+        .sw-item.selected { background:rgba(139,92,246,0.15);box-shadow:0 0 0 2px var(--accent); }
+        .sw-item .remove-badge { position:absolute;top:2px;right:2px;background:var(--danger);color:white;width:18px;height:18px;border-radius:50%;font-size:0.6rem;display:flex;align-items:center;justify-content:center;cursor:pointer; }
+    </style>
 </head>
 <body>
     <div class="bg-blob blob-1"></div>
@@ -13,34 +22,37 @@
     <div class="bg-blob blob-3"></div>
 
     <nav class="navbar">
-        <div class="navbar-brand" onclick="window.location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
+        <div class="navbar-brand" onclick="location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
         <div class="navbar-actions">
-            <a href="inventory.html" class="navbar-link" title="Inventaire">🎒</a>
-            <a href="sticker-world.html" class="navbar-link" title="Sticker World" style="color:var(--accent);">🌍</a>
-            <a href="friends.html" class="navbar-link" title="Amis">👥</a>
-            <a href="trades.html" class="navbar-link" title="Échanges">🔄</a>
+            <a href="inventory.html" class="navbar-link">🎒</a>
+            <a href="sticker-world.html" class="navbar-link" style="color:var(--accent);">🌍</a>
+            <a href="friends.html" class="navbar-link">👥</a>
+            <a href="trades.html" class="navbar-link">🔄</a>
             <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
         </div>
     </nav>
 
     <div class="main-content">
-        <div class="section-title">🌍 Sticker World</div>
-        <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:16px;text-align:center;">Découvre les profils et suis les autres !</p>
-
-        <div class="card" style="margin-bottom:16px;">
-            <div style="display:flex;gap:8px;">
-                <input type="text" id="search-input" placeholder="Rechercher un pseudo..." style="flex:1;padding:10px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);font-family:'Outfit',sans-serif;font-size:0.85rem;outline:none;background:rgba(255,255,255,0.5);" oninput="renderProfiles()">
-                <select id="sort-select" onchange="renderProfiles()" style="padding:10px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);font-family:'Outfit',sans-serif;font-size:0.85rem;background:rgba(255,255,255,0.5);cursor:pointer;">
-                    <option value="points">⭐ Points</option>
-                    <option value="streak">🔥 Streak</option>
-                    <option value="sessions">📚 Sessions</option>
-                </select>
-            </div>
+        <!-- MON STICKER WALL (rétractable) -->
+        <div class="collapsible-header" onclick="toggleMyWall()">
+            <span>🏷️ <strong>Mon Sticker Wall</strong> <span id="wall-count" style="font-size:0.8rem;color:var(--text-dim);"></span></span>
+            <span id="wall-arrow" style="transition:transform 0.2s;">▼</span>
+        </div>
+        <div class="collapsible-body" id="my-wall-body">
+            <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">Clique sur un sticker pour l'ajouter/retirer. Les 6 premiers sont visibles par tous.</p>
+            <div class="sw-grid" id="my-wall-grid"></div>
         </div>
 
-        <div id="profiles-list">
-            <div class="empty-state"><div class="empty-icon">🔍</div><p>Chargement...</p></div>
+        <!-- AMIS (follows mutuels) -->
+        <div class="section-title">⭐ Mes amis</div>
+        <div id="friends-section"><p style="color:var(--text-dim);font-size:0.8rem;">Chargement...</p></div>
+
+        <!-- AUTRES -->
+        <div class="section-title">🔍 Autres utilisateurs</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <input type="text" id="search-input" placeholder="Rechercher..." style="flex:1;padding:10px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);font-family:'Outfit',sans-serif;font-size:0.85rem;outline:none;" oninput="renderOthers()">
         </div>
+        <div id="others-section"><p style="color:var(--text-dim);font-size:0.8rem;">Chargement...</p></div>
     </div>
 
     <nav class="bottom-nav">
@@ -51,166 +63,162 @@
         <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
     </nav>
 
+    <!-- MODAL : voir tous les stickers d'un utilisateur -->
     <div class="modal-overlay" id="profile-modal">
-        <div class="modal-content" style="max-width:360px;padding:30px 24px;text-align:center;">
-            <div style="position:relative;width:80px;height:80px;margin:0 auto 15px;">
-                <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:white;box-shadow:var(--shadow-lg);overflow:hidden;" id="modal-avatar-container">
-                    <span id="modal-avatar-emoji">👤</span>
-                    <img id="modal-avatar-img" src="" style="display:none;width:100%;height:100%;object-fit:cover;">
-                </div>
-                <span style="position:absolute;top:-5px;right:-5px;font-size:1.3rem;" id="modal-sticker1"></span>
-                <span style="position:absolute;bottom:-5px;left:-5px;font-size:1.3rem;" id="modal-sticker2"></span>
-            </div>
+        <div class="modal-content" style="max-width:400px;max-height:80vh;overflow-y:auto;padding:24px;text-align:center;">
+            <div style="font-size:3rem;" id="modal-avatar-display">👤</div>
             <div class="modal-name" id="modal-username">@user</div>
-            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0;">
-                <span style="background:var(--accent-pale);color:var(--accent);padding:4px 10px;border-radius:8px;font-size:0.75rem;">⭐ <span id="modal-points">0</span></span>
-                <span style="background:#fef3c7;color:#d97706;padding:4px 10px;border-radius:8px;font-size:0.75rem;">🔥 <span id="modal-streak">0</span>j</span>
-                <span style="background:#d1fae5;color:#059669;padding:4px 10px;border-radius:8px;font-size:0.75rem;">📚 <span id="modal-sessions">0</span></span>
+            <div style="display:flex;gap:10px;justify-content:center;margin:8px 0;font-size:0.8rem;">
+                <span>⭐ <strong id="modal-points">0</strong></span>
+                <span>🔥 <strong id="modal-streak">0</strong>j</span>
             </div>
-            <div style="margin:16px 0;">
-                <p style="font-size:0.8rem;color:var(--text-dim);font-weight:600;margin-bottom:8px;">🏷️ Stickers équipés</p>
-                <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;" id="modal-stickers-list"></div>
-            </div>
-            <button class="btn-primary" id="modal-follow-btn" onclick="toggleFollow()" style="margin-bottom:8px;">👥 Suivre</button>
-            <button class="modal-btn secondary" onclick="closeProfileModal()">Fermer</button>
+            <p style="font-size:0.8rem;color:var(--text-dim);font-weight:600;margin-top:12px;">🏷️ Sticker Wall complet</p>
+            <div id="modal-full-wall" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;"></div>
+            <button class="modal-btn" style="margin-top:16px;" onclick="closeProfileModal()">Fermer</button>
         </div>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script src="config.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
     <script>
-        const SUPABASE_URL = CONFIG.SUPABASE_URL;
-        const SUPABASE_KEY = CONFIG.SUPABASE_KEY;
-        let supabase = null, supabaseReady = false;
-        (async function(){ try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); supabaseReady = true; } catch(e) {} })();
-
         const currentUser = localStorage.getItem('receiptit_logged_user');
-        if (!currentUser) window.location.href = 'login.html';
+        if (!currentUser) location.href = 'login.html';
 
-        let allProfiles = [];
-        let selectedProfile = null;
-        let myState = { following: [], points: 0 };
+        let myState = { points:0,inventory:{},stickerWall:[],avatarEmoji:'👤',profilePic:null,following:[],followers:[] };
+        let allUsers = [];
 
         function loadMyState() {
-            const s = localStorage.getItem('receiptit_state_' + currentUser);
-            if (s) try { myState = { ...myState, ...JSON.parse(s) }; } catch(e) {}
+            const s = localStorage.getItem('receiptit_state_'+currentUser);
+            if (s) try { myState = {...myState,...JSON.parse(s)}; if(!myState.stickerWall)myState.stickerWall=[]; } catch(e) {}
         }
 
-        function loadProfiles() {
-            loadMyState();
-            const users = JSON.parse(localStorage.getItem('receiptit_users') || '{}');
-            allProfiles = [];
-            Object.keys(users).forEach(username => {
-                const stateKey = 'receiptit_state_' + username;
-                const saved = localStorage.getItem(stateKey);
-                if (saved) {
-                    try {
-                        const st = JSON.parse(saved);
-                        allProfiles.push({
-                            username, points: st.points || 0, totalSessions: st.totalSessions || 0,
-                            streak: st.streak || 0, packsOpened: st.packsOpened || 0,
-                            equippedStickers: st.equippedStickers || [], avatarEmoji: st.avatarEmoji || '👤',
-                            profilePic: st.profilePic || null, inventory: st.inventory || {},
-                            followers: st.followers || [], following: st.following || []
-                        });
-                    } catch(e) {}
-                }
+        function saveMyState() {
+            const existing = JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}');
+            existing.stickerWall = myState.stickerWall;
+            localStorage.setItem('receiptit_state_'+currentUser, JSON.stringify(existing));
+        }
+
+        function loadAllUsers() {
+            const users = JSON.parse(localStorage.getItem('receiptit_users')||'{}');
+            allUsers = [];
+            Object.keys(users).forEach(u => {
+                const s = localStorage.getItem('receiptit_state_'+u);
+                if (s) try {
+                    const st = JSON.parse(s);
+                    allUsers.push({ username:u, points:st.points||0, streak:st.streak||0, stickerWall:st.stickerWall||[], avatarEmoji:st.avatarEmoji||'👤', profilePic:st.profilePic||null, inventory:st.inventory||{}, followers:st.followers||[], following:st.following||[] });
+                } catch(e) {}
             });
-            renderProfiles();
         }
 
-        function renderProfiles() {
-            const search = document.getElementById('search-input')?.value?.toLowerCase() || '';
-            const sort = document.getElementById('sort-select')?.value || 'points';
-            let filtered = allProfiles.filter(p => p.username.toLowerCase().includes(search));
-            if (sort === 'points') filtered.sort((a,b) => b.points - a.points);
-            if (sort === 'streak') filtered.sort((a,b) => b.streak - a.streak);
-            if (sort === 'sessions') filtered.sort((a,b) => b.totalSessions - a.totalSessions);
+        // ============ MON WALL RÉTRACTABLE ============
+        function toggleMyWall() {
+            const body = document.getElementById('my-wall-body');
+            const arrow = document.getElementById('wall-arrow');
+            body.classList.toggle('open');
+            arrow.textContent = body.classList.contains('open') ? '▲' : '▼';
+            if (body.classList.contains('open')) renderMyWallGrid();
+        }
 
-            const container = document.getElementById('profiles-list');
-            if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><h3>Aucun profil</h3></div>'; return; }
+        function renderMyWallGrid() {
+            const grid = document.getElementById('my-wall-grid');
+            const items = Object.entries(myState.inventory).map(([k,v]) => ({key:k,...v}));
+            document.getElementById('wall-count').textContent = '('+myState.stickerWall.length+' stickers)';
 
-            container.innerHTML = filtered.map(p => {
-                const isMe = p.username === currentUser;
-                const stickers = (p.equippedStickers || []).slice(0, 2);
-                const inv = p.inventory || {};
-                return `<div class="card" style="cursor:pointer;" onclick="showProfile('${p.username}')">
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <div style="position:relative;flex-shrink:0;">
-                            <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;overflow:hidden;">
-                                ${p.profilePic ? `<img src="${p.profilePic}" style="width:100%;height:100%;object-fit:cover;">` : (p.avatarEmoji||'👤')}
-                            </div>
-                            ${stickers[0]&&inv[stickers[0]]?`<span style="position:absolute;top:-4px;right:-4px;font-size:1rem;">${inv[stickers[0]].icon}</span>`:''}
-                            ${stickers[1]&&inv[stickers[1]]?`<span style="position:absolute;bottom:-4px;left:-4px;font-size:1rem;">${inv[stickers[1]].icon}</span>`:''}
-                        </div>
-                        <div style="flex:1;min-width:0;">
-                            <div style="font-weight:700;font-size:0.9rem;">${p.username} ${isMe?'<span style="background:var(--accent-pale);color:var(--accent);padding:1px 6px;border-radius:4px;font-size:0.6rem;">TOI</span>':''}</div>
-                            <div style="display:flex;gap:10px;font-size:0.7rem;color:var(--text-dim);">
-                                <span>⭐ ${p.points}</span><span>🔥 ${p.streak}j</span><span>👥 ${(p.followers||[]).length}</span>
-                            </div>
-                        </div>
-                        <span style="font-size:1.2rem;color:var(--text-light);">→</span>
-                    </div>
+            if (!items.length) {
+                grid.innerHTML = '<div style="grid-column:span 6;text-align:center;color:var(--text-light);padding:20px;">Pas encore de stickers. Ouvre des packs !</div>';
+                return;
+            }
+
+            grid.innerHTML = items.map(item => {
+                const inWall = myState.stickerWall.includes(item.key);
+                return `<div class="sw-item ${inWall?'selected':''}" onclick="toggleWallSticker('${item.key.replace(/'/g,"\\'")}')">
+                    ${item.i||item.icon}
+                    ${inWall ? '<span class="remove-badge">×</span>' : ''}
+                    <div style="font-size:0.55rem;color:var(--text-dim);">${item.n||item.name}</div>
+                    <div style="font-size:0.5rem;">x${item.count}</div>
                 </div>`;
             }).join('');
         }
 
-        function showProfile(username) {
-            selectedProfile = allProfiles.find(p => p.username === username);
-            if (!selectedProfile) return;
-            const isMe = selectedProfile.username === currentUser;
-
-            document.getElementById('modal-username').textContent = '@' + selectedProfile.username;
-            document.getElementById('modal-points').textContent = selectedProfile.points;
-            document.getElementById('modal-streak').textContent = selectedProfile.streak;
-            document.getElementById('modal-sessions').textContent = selectedProfile.totalSessions;
-
-            if (selectedProfile.profilePic) {
-                document.getElementById('modal-avatar-img').src = selectedProfile.profilePic;
-                document.getElementById('modal-avatar-img').style.display = 'block';
-                document.getElementById('modal-avatar-emoji').style.display = 'none';
+        function toggleWallSticker(key) {
+            const idx = myState.stickerWall.indexOf(key);
+            if (idx > -1) {
+                myState.stickerWall.splice(idx, 1);
             } else {
-                document.getElementById('modal-avatar-emoji').textContent = selectedProfile.avatarEmoji || '👤';
-                document.getElementById('modal-avatar-img').style.display = 'none';
-                document.getElementById('modal-avatar-emoji').style.display = 'block';
+                myState.stickerWall.push(key);
+            }
+            saveMyState();
+            renderMyWallGrid();
+            renderAllSections();
+        }
+
+        // ============ AFFICHAGE ============
+        function renderAllSections() {
+            const mutuals = allUsers.filter(u => u.username!==currentUser && myState.following.includes(u.username) && u.followers.includes(currentUser));
+            const others = allUsers.filter(u => u.username!==currentUser && !mutuals.includes(u));
+
+            // AMIS
+            document.getElementById('friends-section').innerHTML = mutuals.length ? mutuals.map(u => renderUserCard(u)).join('') : '<p style="color:var(--text-dim);font-size:0.8rem;">Aucun ami pour le moment.</p>';
+
+            // AUTRES
+            renderOthers();
+        }
+
+        function renderUserCard(u) {
+            const wallPreview = (u.stickerWall||[]).slice(0, 6);
+            const inv = u.inventory||{};
+            return `<div class="card" style="cursor:pointer;" onclick="showFullWall('${u.username}')">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;overflow:hidden;">
+                        ${u.profilePic?`<img src="${u.profilePic}" style="width:100%;height:100%;object-fit:cover;">`:u.avatarEmoji||'👤'}
+                    </div>
+                    <div style="flex:1;"><strong>@${u.username}</strong><div style="font-size:0.7rem;color:var(--text-dim);">⭐${u.points} · 🔥${u.streak}j</div></div>
+                    <span style="font-size:1.2rem;color:var(--text-light);">→</span>
+                </div>
+                ${wallPreview.length ? `<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;">${wallPreview.map(sk=>{const item=inv[sk];return item?`<span style="font-size:1.2rem;">${item.i||item.icon}</span>`:'';}).join('')}<span style="font-size:0.65rem;color:var(--text-dim);">+${(u.stickerWall||[]).length-6>0?(u.stickerWall||[]).length-6+' more':''}</span></div>` : '<div style="font-size:0.7rem;color:var(--text-light);margin-top:4px;">Sticker Wall vide</div>'}
+            </div>`;
+        }
+
+        function renderOthers() {
+            const search = document.getElementById('search-input')?.value?.toLowerCase()||'';
+            const mutuals = allUsers.filter(u => u.username!==currentUser && myState.following.includes(u.username) && u.followers.includes(currentUser));
+            const others = allUsers.filter(u => u.username!==currentUser && !mutuals.includes(u) && u.username.includes(search));
+            document.getElementById('others-section').innerHTML = others.length ? others.map(u => renderUserCard(u)).join('') : '<p style="color:var(--text-dim);font-size:0.8rem;">Aucun utilisateur trouvé.</p>';
+        }
+
+        // ============ FULL WALL MODAL ============
+        function showFullWall(username) {
+            const u = allUsers.find(p => p.username === username);
+            if (!u) return;
+            document.getElementById('modal-username').textContent = '@'+u.username;
+            document.getElementById('modal-points').textContent = u.points;
+            document.getElementById('modal-streak').textContent = u.streak;
+            document.getElementById('modal-avatar-display').textContent = u.profilePic ? '' : (u.avatarEmoji||'👤');
+            if (u.profilePic) {
+                document.getElementById('modal-avatar-display').innerHTML = `<img src="${u.profilePic}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">`;
             }
 
-            const stickers = selectedProfile.equippedStickers || [];
-            const inv = selectedProfile.inventory || {};
-            document.getElementById('modal-sticker1').textContent = stickers[0]&&inv[stickers[0]]?inv[stickers[0]].icon:'';
-            document.getElementById('modal-sticker2').textContent = stickers[1]&&inv[stickers[1]]?inv[stickers[1]].icon:'';
-            document.getElementById('modal-stickers-list').innerHTML = stickers.length ? stickers.map(sk => {
+            const wall = u.stickerWall||[];
+            const inv = u.inventory||{};
+            document.getElementById('modal-full-wall').innerHTML = wall.length ? wall.map(sk => {
                 const item = inv[sk];
-                return item ? `<div style="text-align:center;"><span style="font-size:2rem;">${item.icon}</span><span style="font-size:0.7rem;display:block;color:var(--text-dim);">${item.name}</span></div>` : '';
-            }).join('') : '<span style="font-size:0.8rem;color:var(--text-light);">Aucun sticker</span>';
+                return item ? `<div style="text-align:center;font-size:2rem;padding:6px;">${item.i||item.icon}<div style="font-size:0.6rem;color:var(--text-dim);">${item.n||item.name}</div></div>` : '';
+            }).join('') : '<span style="color:var(--text-light);">Sticker Wall vide</span>';
 
-            const btn = document.getElementById('modal-follow-btn');
-            if (isMe) { btn.style.display = 'none'; }
-            else {
-                btn.style.display = 'block';
-                const isFollowing = (myState.following || []).includes(selectedProfile.username);
-                btn.textContent = isFollowing ? '✅ Abonné' : '👥 Suivre';
-                btn.style.background = isFollowing ? 'var(--success)' : '';
-            }
             document.getElementById('profile-modal').classList.add('active');
         }
 
-        function toggleFollow() {
-            if (!selectedProfile || selectedProfile.username === currentUser) return;
-            const idx = (myState.following || []).indexOf(selectedProfile.username);
-            if (idx > -1) { myState.following.splice(idx, 1); showToast('💔 Unfollow'); }
-            else { myState.following.push(selectedProfile.username); showToast('✅ Follow !'); }
-            localStorage.setItem('receiptit_state_' + currentUser, JSON.stringify({ ...JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}'), following: myState.following }));
-            loadProfiles();
-            showProfile(selectedProfile.username);
-        }
+        function closeProfileModal() { document.getElementById('profile-modal').classList.remove('active'); }
 
-        function closeProfileModal() { document.getElementById('profile-modal').classList.remove('active'); selectedProfile = null; }
-        function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMyState();
+            loadAllUsers();
+            document.getElementById('nav-points').textContent = myState.points;
+            document.getElementById('wall-count').textContent = '('+myState.stickerWall.length+' stickers)';
+            renderAllSections();
+        });
 
-        document.addEventListener('DOMContentLoaded', () => { loadProfiles(); });
         document.getElementById('profile-modal').addEventListener('click', e => { if (e.target.id === 'profile-modal') closeProfileModal(); });
     </script>
 </body>
