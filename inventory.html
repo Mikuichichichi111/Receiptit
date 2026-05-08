@@ -58,77 +58,32 @@
         <div class="modal-content"><span class="modal-icon" id="modal-icon">🎁</span><div class="modal-name" id="modal-name">Item</div><div class="modal-rarity" id="modal-rarity">Rarity</div><div class="modal-count" id="modal-count">x1</div><button class="modal-btn" onclick="closeModal()">OK</button></div>
     </div>
 
-    <script src="config.js"></script>
     <script>
-        const currentUser = localStorage.getItem('receiptit_logged_user');
-        if (!currentUser) location.href = 'login.html';
+const currentUser=localStorage.getItem('receiptit_logged_user');
+if(!currentUser)location.href='login.html';
 
-        let state = { points:0, inventory:{} };
-        let currentFilter = 'all';
-        const RC = { common:'#94a3b8', rare:'#60a5fa', epic:'#a78bfa', legendary:'#fbbf24', divine:'#f472b6' };
-        const RN = { common:'Commun', rare:'Rare', epic:'Épique', legendary:'Légendaire', divine:'Divin' };
-        const RO = { divine:5, legendary:4, epic:3, rare:2, common:1 };
+let state={points:0,inventory:{}};
+let cf='all';
+const RC={common:'#94a3b8',rare:'#60a5fa',epic:'#a78bfa',legendary:'#fbbf24',divine:'#f472b6'};
+const RN={common:'Commun',rare:'Rare',epic:'Épique',legendary:'Légendaire',divine:'Divin'};
+const RO={divine:5,legendary:4,epic:3,rare:2,common:1};
 
-        function loadState() {
-            const c = localStorage.getItem('receiptit_state_'+currentUser);
-            if (c) try { state = {...state, ...JSON.parse(c)}; } catch(e) {}
-        }
+async function loadData(){
+    if(typeof supabaseOnline!=='undefined'&&supabaseOnline){
+        try{let{data}=await supabase.from('receiptit_users').select('points,inventory').eq('username',currentUser).single();
+        if(data){state.points=data.points||0;state.inventory=data.inventory||{};localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(state));return;}}catch(e){}
+    }
+    let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{state={...state,...JSON.parse(s)};}catch(e){}
+}
 
-        function updateStats() {
-            const counts = {common:0,rare:0,epic:0,legendary:0,divine:0};
-            Object.values(state.inventory).forEach(item => { if (counts[item.rarity] !== undefined) counts[item.rarity] += item.count || 0; });
-            Object.keys(counts).forEach(r => { const el = document.getElementById('count-'+r); if (el) el.textContent = counts[r]; });
-        }
+function updateStats(){let c={common:0,rare:0,epic:0,legendary:0,divine:0};Object.values(state.inventory).forEach(i=>{if(c[i.rarity]!==undefined)c[i.rarity]+=i.count||0;});Object.keys(c).forEach(r=>{let el=document.getElementById('count-'+r);if(el)el.textContent=c[r];});}
+function filterItems(f){cf=f;document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));document.querySelector('[data-filter="'+f+'"]')?.classList.add('active');render();}
+function render(){let g=document.getElementById('inventory-grid');let items=Object.entries(state.inventory).map(([k,v])=>({key:k,...v}));let filtered=cf==='all'?items:items.filter(i=>i.rarity===cf);if(!filtered.length){g.innerHTML='<div class="empty-state" style="grid-column:span 3;"><div class="empty-icon">🎒</div><h3>'+(cf==='all'?'Inventaire vide':'Aucun item')+'</h3><p>Ouvre des packs !</p></div>';updateStats();return;}filtered.sort((a,b)=>(RO[b.rarity]-RO[a.rarity])||(b.count||0)-(a.count||0));g.innerHTML=filtered.map(item=>'<div class="inv-item" onclick="showDetail(\''+(item.n||item.name)+'\',\''+item.rarity+'\',\''+(item.i||item.icon)+'\','+(item.count||1)+')"><div class="item-rarity-bar" style="background:'+RC[item.rarity]+';"></div><span class="item-icon">'+(item.i||item.icon)+'</span><div class="item-name">'+(item.n||item.name)+'</div><div class="item-rarity" style="color:'+RC[item.rarity]+'">'+RN[item.rarity]+'</div><span class="item-count">x'+(item.count||1)+'</span></div>').join('');updateStats();}
+function showDetail(name,rarity,icon,count){document.getElementById('modal-icon').textContent=icon;document.getElementById('modal-name').textContent=name;document.getElementById('modal-name').style.color=RC[rarity];document.getElementById('modal-rarity').textContent=RN[rarity];document.getElementById('modal-rarity').style.color=RC[rarity];document.getElementById('modal-count').textContent='Tu en as '+count;document.getElementById('modal-overlay').classList.add('active');}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('active');}
 
-        function filterItems(filter) {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[data-filter="${filter}"]`)?.classList.add('active');
-            renderInventory();
-        }
-
-        function renderInventory() {
-            const grid = document.getElementById('inventory-grid');
-            const items = Object.entries(state.inventory).map(([k,v]) => ({key:k, ...v}));
-            const filtered = currentFilter === 'all' ? items : items.filter(i => i.rarity === currentFilter);
-
-            if (!filtered.length) {
-                grid.innerHTML = `<div class="empty-state" style="grid-column:span 3;"><div class="empty-icon">🎒</div><h3>${currentFilter==='all'?'Inventaire vide':'Aucun item'}</h3><p>Ouvre des packs !</p></div>`;
-                updateStats(); return;
-            }
-
-            filtered.sort((a,b) => (RO[b.rarity] - RO[a.rarity]) || (b.count||0) - (a.count||0));
-
-            grid.innerHTML = filtered.map(item => `
-                <div class="inv-item" onclick="showDetail('${item.n||item.name}','${item.rarity}','${item.i||item.icon}',${item.count||1})">
-                    <div class="item-rarity-bar" style="background:${RC[item.rarity]};"></div>
-                    <span class="item-icon">${item.i||item.icon}</span>
-                    <div class="item-name">${item.n||item.name}</div>
-                    <div class="item-rarity" style="color:${RC[item.rarity]}">${RN[item.rarity]}</div>
-                    <span class="item-count">x${item.count||1}</span>
-                </div>
-            `).join('');
-            updateStats();
-        }
-
-        function showDetail(name, rarity, icon, count) {
-            document.getElementById('modal-icon').textContent = icon;
-            document.getElementById('modal-name').textContent = name;
-            document.getElementById('modal-name').style.color = RC[rarity];
-            document.getElementById('modal-rarity').textContent = RN[rarity];
-            document.getElementById('modal-rarity').style.color = RC[rarity];
-            document.getElementById('modal-count').textContent = 'Tu en as ' + count;
-            document.getElementById('modal-overlay').classList.add('active');
-        }
-
-        function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadState();
-            document.getElementById('nav-points').textContent = state.points;
-            updateStats(); renderInventory();
-        });
-        document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target.id === 'modal-overlay') closeModal(); });
-    </script>
+document.addEventListener('DOMContentLoaded',async()=>{await loadData();document.getElementById('nav-points').textContent=state.points;updateStats();render();});
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target.id==='modal-overlay')closeModal();});
+</script>
 </body>
 </html>
