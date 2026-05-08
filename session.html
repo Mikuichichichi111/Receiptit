@@ -89,8 +89,8 @@
 <script>
 const SUPABASE_URL='https://fonraobtmkaallsjxtoj.supabase.co';
 const SUPABASE_KEY='sb_publishable_QxU-Ql1Mux18PlLjGady5g_gwkTCKSH';
-let supabase=null,supabaseOnline=false;
-(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);supabaseOnline=true}catch(e){supabaseOnline=false}})();
+let supabase=null;
+(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);console.log('✅ Supabase OK');}catch(e){console.error('❌ Supabase error:',e);}})();
 
 const currentUser=localStorage.getItem('receiptit_logged_user');
 if(!currentUser)location.href='login.html';
@@ -99,47 +99,22 @@ let state={points:0,sessions:[],totalSessions:0,streak:0,userId:localStorage.get
 let sd={type:null,points:0,subject:null,lessonName:'',lessonNotes:'',comprehension:null,exerciseName:'',exerciseNotes:'',exerciseCount:1};
 let cs=1;
 
-async function saveData(){localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(state));if(!supabaseOnline)return;try{await supabase.from('receiptit_users').upsert({user_id:state.userId,username:currentUser,points:state.points,sessions:state.sessions,total_sessions:state.totalSessions,streak:state.streak,updated_at:new Date().toISOString()},{onConflict:'username'});}catch(e){}}
-async function loadData(){if(supabaseOnline){try{let{data}=await supabase.from('receiptit_users').select('*').eq('username',currentUser).single();if(data){state.points=data.points||0;state.sessions=data.sessions||[];state.totalSessions=data.total_sessions||0;state.streak=data.streak||0;state.userId=data.user_id||state.userId;localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(state));return;}}catch(e){}}let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{state={...state,...JSON.parse(s)};}catch(e){}}
+async function saveData(){localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(state));try{let{error}=await supabase.from('receiptit_users').update({points:state.points,sessions:state.sessions,total_sessions:state.totalSessions,streak:state.streak,updated_at:new Date().toISOString()}).eq('username',currentUser);if(error)console.error('Save error:',error);else console.log('✅ Saved:',state.points,'pts');}catch(e){console.error('Save exception:',e);}}
+async function loadData(){try{let{data,error}=await supabase.from('receiptit_users').select('points,sessions,total_sessions,streak,user_id').eq('username',currentUser).single();if(!error&&data){state.points=data.points||0;state.sessions=data.sessions||[];state.totalSessions=data.total_sessions||0;state.streak=data.streak||0;state.userId=data.user_id||state.userId;console.log('✅ Loaded:',state.points,'pts');return;}}catch(e){console.error('Load error:',e);}let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{state={...state,...JSON.parse(s)};console.log('⚠️ Loaded from localStorage');}catch(e){}}
 
 function getStreakMultiplier(){return state.streak<=0?1.0:Math.min(1+(state.streak*0.1),3.0);}
 function calculateStreak(){let ss=state.sessions;if(!ss.length)return 0;let dates=[...new Set(ss.map(s=>new Date(s.date).toDateString()))].sort((a,b)=>new Date(b)-new Date(a));let today=new Date().toDateString(),yesterday=new Date(Date.now()-86400000).toDateString();if(dates[0]!==today&&dates[0]!==yesterday)return 0;let st=0,check=new Date(dates[0]);for(let d of dates){if(d===check.toDateString()){st++;check.setDate(check.getDate()-1);}else if(st===0&&d===yesterday){st++;check.setDate(check.getDate()-1);}else break;}return st;}
 
-function goToStep(step){
-    if(step===2&&!sd.type){showToast('⚠️ Choisis un type !');return;}
-    if(step===3&&!sd.subject){showToast('⚠️ Choisis une matière !');return;}
-    if(step===4){if(sd.type==='lesson'){sd.lessonName=document.getElementById('lesson-name')?.value?.trim()||'';if(!sd.lessonName){showToast('⚠️ Nom de leçon !');return;}}if(sd.type==='exercise'){sd.exerciseName=document.getElementById('exercise-name')?.value?.trim()||'';if(!sd.exerciseName){showToast('⚠️ Nom d\'exercice !');return;}}updateRecap();}
-    cs=step;for(let i=1;i<=4;i++){let el=document.getElementById('step-'+i);if(el)el.style.display='none';}
-    let target=document.getElementById('step-'+step);if(target){target.style.display='block';target.scrollIntoView({behavior:'smooth'});}
-    document.querySelectorAll('.step-dot').forEach((dot,idx)=>{dot.classList.remove('active','done');if(idx+1<step)dot.classList.add('done');if(idx+1===step)dot.classList.add('active');});
-    if(step===3){document.getElementById('lesson-details').style.display=sd.type==='lesson'?'block':'none';document.getElementById('exercise-details').style.display=sd.type==='lesson'?'none':'block';}
-}
-
+function goToStep(step){if(step===2&&!sd.type){showToast('⚠️ Choisis un type !');return;}if(step===3&&!sd.subject){showToast('⚠️ Choisis une matière !');return;}if(step===4){if(sd.type==='lesson'){sd.lessonName=document.getElementById('lesson-name')?.value?.trim()||'';if(!sd.lessonName){showToast('⚠️ Nom de leçon !');return;}}if(sd.type==='exercise'){sd.exerciseName=document.getElementById('exercise-name')?.value?.trim()||'';if(!sd.exerciseName){showToast('⚠️ Nom d\'exercice !');return;}}updateRecap();}cs=step;for(let i=1;i<=4;i++){let el=document.getElementById('step-'+i);if(el)el.style.display='none';}let target=document.getElementById('step-'+step);if(target){target.style.display='block';target.scrollIntoView({behavior:'smooth'});}document.querySelectorAll('.step-dot').forEach((dot,idx)=>{dot.classList.remove('active','done');if(idx+1<step)dot.classList.add('done');if(idx+1===step)dot.classList.add('active');});if(step===3){document.getElementById('lesson-details').style.display=sd.type==='lesson'?'block':'none';document.getElementById('exercise-details').style.display=sd.type==='lesson'?'none':'block';}}
 function selectType(card){document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('active'));card.classList.add('active');sd.type=card.dataset.type;sd.points=parseInt(card.dataset.points);setTimeout(()=>goToStep(2),300);}
 function selectSubject(chip){document.querySelectorAll('.subject-chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');sd.subject=chip.dataset.subject;}
 function addCustomSubject(){let v=document.getElementById('custom-subject').value.trim();if(!v){showToast('⚠️ Écris une matière !');return;}sd.subject=v;document.querySelectorAll('.subject-chip').forEach(c=>c.classList.remove('active'));showToast('✅ '+v);}
 function selectComp(card){document.querySelectorAll('.comp-card').forEach(c=>c.classList.remove('active'));card.classList.add('active');sd.comprehension=card.dataset.level;}
 function changeCount(d){sd.exerciseCount=Math.max(1,Math.min(50,sd.exerciseCount+d));document.getElementById('exercise-count').textContent=sd.exerciseCount;}
 
-function updateRecap(){
-    let mult=getStreakMultiplier();
-    let html='<strong>'+(sd.type==='lesson'?'📚 Leçon':'✏️ Exercice')+'</strong> — '+sd.subject+'<br>';
-    if(sd.type==='lesson'){html+='<strong>Leçon:</strong> '+sd.lessonName+'<br>';if(sd.lessonNotes)html+='<strong>Notes:</strong> '+sd.lessonNotes+'<br>';if(sd.comprehension)html+='<strong>Compréhension:</strong> '+({'not':'😵‍💫','review':'🤔','ok':'😎'}[sd.comprehension])+'<br>';let fp=Math.round(sd.points*mult);html+=mult>1?'<strong>Points:</strong> '+sd.points+'×'+mult.toFixed(1)+'=<strong style="color:var(--success);">+'+fp+' pts</strong>':'<strong>Points:</strong> +'+sd.points+' pts';}
-    else{html+='<strong>Exercice:</strong> '+sd.exerciseName+'<br><strong>Nombre:</strong> '+sd.exerciseCount+'<br>';if(sd.exerciseNotes)html+='<strong>Notes:</strong> '+sd.exerciseNotes+'<br>';let bp=sd.points*sd.exerciseCount,fp=Math.round(bp*mult);html+=mult>1?'<strong>Points:</strong> '+bp+'×'+mult.toFixed(1)+'=<strong style="color:var(--success);">+'+fp+' pts</strong>':'<strong>Points:</strong> +'+bp+' pts';}
-    if(state.streak>0)html+='<br><span style="color:var(--warning);">🔥 Streak '+state.streak+'j → ×'+mult.toFixed(1)+'</span>';
-    document.getElementById('recap-content').innerHTML=html;
-}
+function updateRecap(){let mult=getStreakMultiplier();let html='<strong>'+(sd.type==='lesson'?'📚 Leçon':'✏️ Exercice')+'</strong> — '+sd.subject+'<br>';if(sd.type==='lesson'){html+='<strong>Leçon:</strong> '+sd.lessonName+'<br>';if(sd.lessonNotes)html+='<strong>Notes:</strong> '+sd.lessonNotes+'<br>';if(sd.comprehension)html+='<strong>Compréhension:</strong> '+({'not':'😵‍💫','review':'🤔','ok':'😎'}[sd.comprehension])+'<br>';let fp=Math.round(sd.points*mult);html+=mult>1?'<strong>Points:</strong> '+sd.points+'×'+mult.toFixed(1)+'=<strong style="color:var(--success);">+'+fp+' pts</strong>':'<strong>Points:</strong> +'+sd.points+' pts';}else{html+='<strong>Exercice:</strong> '+sd.exerciseName+'<br><strong>Nombre:</strong> '+sd.exerciseCount+'<br>';if(sd.exerciseNotes)html+='<strong>Notes:</strong> '+sd.exerciseNotes+'<br>';let bp=sd.points*sd.exerciseCount,fp=Math.round(bp*mult);html+=mult>1?'<strong>Points:</strong> '+bp+'×'+mult.toFixed(1)+'=<strong style="color:var(--success);">+'+fp+' pts</strong>':'<strong>Points:</strong> +'+bp+' pts';}if(state.streak>0)html+='<br><span style="color:var(--warning);">🔥 Streak '+state.streak+'j → ×'+mult.toFixed(1)+'</span>';document.getElementById('recap-content').innerHTML=html;}
 
-async function submitSession(){
-    let btn=document.getElementById('submit-btn');if(!btn||btn.disabled)return;btn.disabled=true;btn.innerHTML='<span>⏳</span><span>...</span>';
-    let mult=getStreakMultiplier();let pts=sd.type==='lesson'?sd.points:sd.points*sd.exerciseCount;let fp=Math.round(pts*mult);
-    state.points+=fp;state.totalSessions++;
-    state.sessions.push({type:sd.type,label:sd.type==='lesson'?sd.lessonName:sd.exerciseName,points:fp,basePoints:pts,multiplier:mult,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),subject:sd.subject,date:new Date().toISOString()});
-    state.streak=calculateStreak();await saveData();
-    document.getElementById('success-points').textContent='+'+fp+' pts'+(mult>1?' (×'+mult.toFixed(1)+' 🔥)':'');
-    document.getElementById('success-overlay').classList.add('active');document.getElementById('nav-points').textContent=state.points;
-}
-
+async function submitSession(){let btn=document.getElementById('submit-btn');if(!btn||btn.disabled)return;btn.disabled=true;btn.innerHTML='<span>⏳</span><span>...</span>';let mult=getStreakMultiplier();let pts=sd.type==='lesson'?sd.points:sd.points*sd.exerciseCount;let fp=Math.round(pts*mult);state.points+=fp;state.totalSessions++;state.sessions.push({type:sd.type,label:sd.type==='lesson'?sd.lessonName:sd.exerciseName,points:fp,basePoints:pts,multiplier:mult,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),subject:sd.subject,date:new Date().toISOString()});state.streak=calculateStreak();await saveData();document.getElementById('success-points').textContent='+'+fp+' pts'+(mult>1?' (×'+mult.toFixed(1)+' 🔥)':'');document.getElementById('success-overlay').classList.add('active');document.getElementById('nav-points').textContent=state.points;}
 function closeSuccess(){document.getElementById('success-overlay').classList.remove('active');sd={type:null,points:0,subject:null,lessonName:'',lessonNotes:'',comprehension:null,exerciseName:'',exerciseNotes:'',exerciseCount:1};document.querySelectorAll('.type-card,.subject-chip,.comp-card').forEach(el=>el.classList.remove('active'));document.getElementById('lesson-name').value='';document.getElementById('lesson-notes').value='';document.getElementById('exercise-name').value='';document.getElementById('exercise-notes').value='';document.getElementById('exercise-count').textContent='1';let btn=document.getElementById('submit-btn');if(btn){btn.disabled=false;btn.innerHTML='<span>✨</span><span>Valider</span>';}goToStep(1);}
 function showToast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
