@@ -13,44 +13,33 @@
 <nav class="navbar">
     <div class="navbar-brand" onclick="location.href='index.html'">RECEIPTIT</div>
     <div class="navbar-actions">
-        <a href="inventory.html" class="navbar-link">🎒</a>
-        <a href="sticker-world.html" class="navbar-link">🌍</a>
-        <a href="friends.html" class="navbar-link">👥</a>
-        <a href="trades.html" class="navbar-link">🔄</a>
+        <a href="inventory.html" class="navbar-link">🎒</a><a href="sticker-world.html" class="navbar-link">🌍</a>
+        <a href="friends.html" class="navbar-link">👥</a><a href="trades.html" class="navbar-link">🔄</a>
         <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
     </div>
 </nav>
 
 <div class="main-content">
-    <div class="welcome-card">
-        <h1 id="welcome-name">Salut ! 👋</h1>
-        <p>Prêt à bosser aujourd'hui ?</p>
-        <div class="welcome-streak"><span>🔥</span><span id="streak-count">0 jours</span></div>
-    </div>
-
+    <div class="welcome-card"><h1 id="welcome-name">Salut ! 👋</h1><p>Prêt à bosser ?</p><div class="welcome-streak"><span>🔥</span><span id="streak-count">0 jours</span></div></div>
     <div class="stats-row">
         <div class="stat-card"><span class="stat-icon">📚</span><div class="stat-value" id="stat-sessions">0</div><div class="stat-label">Sessions</div></div>
         <div class="stat-card"><span class="stat-icon">🎁</span><div class="stat-value" id="stat-packs">0</div><div class="stat-label">Packs</div></div>
         <div class="stat-card"><span class="stat-icon">🎒</span><div class="stat-value" id="stat-items">0</div><div class="stat-label">Items</div></div>
     </div>
-
     <div class="section-title">⚡ Actions rapides</div>
     <div class="quick-actions">
-        <a href="pomodoro.html" class="action-card pomodoro"><div class="action-icon">⏱️</div><h3>Pomodoro</h3><p>Timer focus</p></a>
-        <a href="session.html" class="action-card session"><div class="action-icon">➕</div><h3>Session</h3><p>Leçon ou exercice</p></a>
-        <a href="pack.html" class="action-card pack"><div class="action-icon">🎁</div><h3>Pack</h3><p>Dépense tes pts</p></a>
-        <a href="inventory.html" class="action-card inventory"><div class="action-icon">🎒</div><h3>Inventaire</h3><p>Tes récompenses</p></a>
-        <a href="profile.html" class="action-card profile"><div class="action-icon">👤</div><h3>Profil</h3><p>Stickers & stats</p></a>
-        <a href="sticker-world.html" class="action-card profile"><div class="action-icon">🌍</div><h3>Sticker World</h3><p>Voir les autres</p></a>
-        <a href="friends.html" class="action-card profile"><div class="action-icon">👥</div><h3>Amis</h3><p>Sessions à 2</p></a>
-        <a href="trades.html" class="action-card profile"><div class="action-icon">🔄</div><h3>Échanges</h3><p>Trade stickers</p></a>
-        <div class="action-card ticket" onclick="showTicket()"><div class="action-icon">📄</div><h3>Ticket</h3><p>Dernier récap</p></div>
+        <a href="pomodoro.html" class="action-card pomodoro"><div class="action-icon">⏱️</div><h3>Pomodoro</h3></a>
+        <a href="session.html" class="action-card session"><div class="action-icon">➕</div><h3>Session</h3></a>
+        <a href="pack.html" class="action-card pack"><div class="action-icon">🎁</div><h3>Pack</h3></a>
+        <a href="inventory.html" class="action-card inventory"><div class="action-icon">🎒</div><h3>Inventaire</h3></a>
+        <a href="profile.html" class="action-card profile"><div class="action-icon">👤</div><h3>Profil</h3></a>
+        <a href="sticker-world.html" class="action-card profile"><div class="action-icon">🌍</div><h3>Sticker World</h3></a>
+        <a href="friends.html" class="action-card profile"><div class="action-icon">👥</div><h3>Amis</h3></a>
+        <a href="trades.html" class="action-card profile"><div class="action-icon">🔄</div><h3>Échanges</h3></a>
+        <div class="action-card ticket" onclick="showTicket()"><div class="action-icon">📄</div><h3>Ticket</h3></div>
     </div>
-
     <div class="section-title">📋 Sessions récentes</div>
-    <div class="session-list" id="session-list">
-        <div class="empty-state"><div class="empty-icon">📝</div><p>Aucune session encore.</p></div>
-    </div>
+    <div class="session-list" id="session-list"><div class="empty-state"><div class="empty-icon">📝</div><p>Aucune session.</p></div></div>
 </div>
 
 <nav class="bottom-nav">
@@ -61,13 +50,10 @@
     <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
 </nav>
 
-<!-- Ticket Modal -->
 <div class="modal-overlay" id="ticket-modal">
     <div class="modal-content" style="max-width:420px;padding:0;background:transparent;box-shadow:none;">
         <div class="printer-container"><div class="printer">🖨️</div></div>
-        <div class="printer-paper" id="printer-paper">
-            <canvas id="ticket-canvas" style="width:100%;display:block;"></canvas>
-        </div>
+        <div class="printer-paper" id="printer-paper"><canvas id="ticket-canvas" style="width:100%;display:block;"></canvas></div>
         <div style="display:flex;gap:0;margin-top:8px;border-radius:14px;overflow:hidden;box-shadow:var(--shadow-lg);">
             <button onclick="shareTicket()" style="flex:1;padding:14px;border:none;background:white;color:var(--accent);font-family:'Outfit',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;">📤</button>
             <button onclick="printTicket()" style="flex:1;padding:14px;border:none;border-left:1px solid #eee;background:white;color:var(--accent2);font-family:'Outfit',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;">🖨️</button>
@@ -75,15 +61,14 @@
         </div>
     </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script>
 const SUPABASE_URL='https://fonraobtmkaallsjxtoj.supabase.co';
 const SUPABASE_KEY='sb_publishable_QxU-Ql1Mux18PlLjGady5g_gwkTCKSH';
-let supabase=null,supabaseOnline=false;
-(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);supabaseOnline=true}catch(e){supabaseOnline=false}})();
+let supabase=null;
+(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);console.log('✅ Supabase OK');}catch(e){console.error('❌ Supabase error:',e);}})();
 
 const currentUser=localStorage.getItem('receiptit_logged_user');
 if(!currentUser)location.href='login.html';
@@ -91,64 +76,45 @@ if(!currentUser)location.href='login.html';
 let state={points:0,sessions:[],inventory:{},packsOpened:0,totalSessions:0,streak:0,packHistory:[],equippedStickers:[],stickerWall:[],avatarEmoji:'👤',profilePic:null,friends:[],followers:[],following:[],userId:localStorage.getItem('receiptit_user_id')||'user_'+Math.random().toString(36).substr(2,9)+'_'+Date.now()};
 let ticketImageData=null;
 
-async function saveData(){localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(state));if(!supabaseOnline)return;try{await supabase.from('receiptit_users').upsert({user_id:state.userId,username:currentUser,points:state.points,sessions:state.sessions,inventory:state.inventory,packs_opened:state.packsOpened,total_sessions:state.totalSessions,streak:state.streak,pack_history:state.packHistory,equipped_stickers:state.equippedStickers,sticker_wall:state.stickerWall,avatar_emoji:state.avatarEmoji,profile_pic:state.profilePic,friends:state.friends,followers:state.followers,following:state.following,updated_at:new Date().toISOString()},{onConflict:'username'});}catch(e){}}
+async function saveData(){localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(state));try{let{error}=await supabase.from('receiptit_users').update({points:state.points,sessions:state.sessions,inventory:state.inventory,packs_opened:state.packsOpened,total_sessions:state.totalSessions,streak:state.streak,pack_history:state.packHistory,equipped_stickers:state.equippedStickers,sticker_wall:state.stickerWall,avatar_emoji:state.avatarEmoji,profile_pic:state.profilePic,friends:state.friends,followers:state.followers,following:state.following,updated_at:new Date().toISOString()}).eq('username',currentUser);if(error)console.error('Save error:',error);else console.log('✅ Saved:',state.points,'pts');}catch(e){console.error('Save exception:',e);}}
 
-async function loadData(){if(supabaseOnline){try{let{data,error}=await supabase.from('receiptit_users').select('*').eq('username',currentUser).single();if(!error&&data){state.points=data.points||0;state.sessions=data.sessions||[];state.inventory=data.inventory||{};state.packsOpened=data.packs_opened||0;state.totalSessions=data.total_sessions||0;state.streak=data.streak||0;state.packHistory=data.pack_history||[];state.equippedStickers=data.equipped_stickers||[];state.stickerWall=data.sticker_wall||[];state.avatarEmoji=data.avatar_emoji||'👤';state.profilePic=data.profile_pic||null;state.friends=data.friends||[];state.followers=data.followers||[];state.following=data.following||[];state.userId=data.user_id||state.userId;localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(state));return;}}catch(e){}}let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{state={...state,...JSON.parse(s)};}catch(e){}}
+async function loadData(){try{let{data,error}=await supabase.from('receiptit_users').select('*').eq('username',currentUser).single();if(!error&&data){state.points=data.points||0;state.sessions=data.sessions||[];state.inventory=data.inventory||{};state.packsOpened=data.packs_opened||0;state.totalSessions=data.total_sessions||0;state.streak=data.streak||0;state.packHistory=data.pack_history||[];state.equippedStickers=data.equipped_stickers||[];state.stickerWall=data.sticker_wall||[];state.avatarEmoji=data.avatar_emoji||'👤';state.profilePic=data.profile_pic||null;state.friends=data.friends||[];state.followers=data.followers||[];state.following=data.following||[];state.userId=data.user_id||state.userId;console.log('✅ Loaded:',state.points,'pts');return;}}catch(e){console.error('Load error:',e);}let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{state={...state,...JSON.parse(s)};console.log('⚠️ Loaded from localStorage');}catch(e){}}
 
 function getStreakMultiplier(){return state.streak<=0?1.0:Math.min(1+(state.streak*0.1),3.0);}
-
 function updateUI(){
-    document.getElementById('nav-points').textContent=state.points;
-    document.getElementById('stat-sessions').textContent=state.totalSessions;
-    document.getElementById('stat-packs').textContent=state.packsOpened;
-    document.getElementById('stat-items').textContent=Object.keys(state.inventory).length;
-    let m=getStreakMultiplier();
-    document.getElementById('streak-count').textContent=state.streak+' jour'+(state.streak>1?'s':'')+(m>1?' (×'+m.toFixed(1)+')':'');
-    document.getElementById('welcome-name').textContent='Salut '+currentUser+' ! 👋';
-    let list=document.getElementById('session-list');
-    let recent=state.sessions.slice(-10).reverse();
+    document.getElementById('nav-points').textContent=state.points;document.getElementById('stat-sessions').textContent=state.totalSessions;document.getElementById('stat-packs').textContent=state.packsOpened;document.getElementById('stat-items').textContent=Object.keys(state.inventory).length;
+    let m=getStreakMultiplier();document.getElementById('streak-count').textContent=state.streak+' jour'+(state.streak>1?'s':'')+(m>1?' (×'+m.toFixed(1)+')':'');document.getElementById('welcome-name').textContent='Salut '+currentUser+' ! 👋';
+    let list=document.getElementById('session-list'),recent=state.sessions.slice(-10).reverse();
     if(!recent.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">📝</div><p>Aucune session.</p></div>';return;}
     list.innerHTML=recent.map(s=>{let ic='work',icon='⏱️';if(s.type==='lesson'){ic='lesson';icon='📚';}if(s.type==='exercise'){ic='exercise';icon='✏️';}if(s.type==='pomodoro'){ic='pomodoro';icon='⏱️';}let meta=s.time||'';if(s.subject)meta+=' · '+s.subject;return'<div class="session-item"><div class="session-icon '+ic+'">'+icon+'</div><div class="session-info"><div class="session-title">'+(s.label||'Session')+'</div><div class="session-meta">'+meta+'</div></div><div class="session-points '+(s.points<0?'negative':'')+'">'+(s.points>0?'+':'')+s.points+' pts</div></div>';}).join('');
 }
 
 function showTicket(){
-    let today=new Date().toDateString();
-    let ts=state.sessions.filter(s=>{try{return new Date(s.date).toDateString()===today}catch(e){return false}});
+    let today=new Date().toDateString(),ts=state.sessions.filter(s=>{try{return new Date(s.date).toDateString()===today}catch(e){return false}});
     let lessons=ts.filter(s=>s.type==='lesson'),exercises=ts.filter(s=>s.type==='exercise'),pomodoros=ts.filter(s=>s.type==='pomodoro');
     let packs=state.packHistory.filter(p=>{try{return new Date(p.time||p.date).toDateString()===today}catch(e){return false}});
     let earned=ts.reduce((s,x)=>s+(x.points>0?x.points:0),0),spent=packs.length*100;
-    let c=document.getElementById('ticket-canvas'),ctx=c.getContext('2d'),W=360,P=20,y=20;
-    let h=250+lessons.length*25+exercises.length*25+pomodoros.length*25+packs.length*25;
-    c.width=W;c.height=Math.min(h,600);
-    ctx.fillStyle='#fff';ctx.fillRect(0,0,W,c.height);
+    let c=document.getElementById('ticket-canvas'),ctx=c.getContext('2d'),W=360,P=20,y=20,h=250+lessons.length*25+exercises.length*25+pomodoros.length*25+packs.length*25;
+    c.width=W;c.height=Math.min(h,600);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,c.height);
     ctx.strokeStyle='#e2e8f0';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.strokeRect(6,6,W-12,c.height-12);ctx.setLineDash([]);
-    ctx.fillStyle='#2d2b55';ctx.font='bold 20px "Space Mono",monospace';ctx.textAlign='center';
-    ctx.fillText('🧾 RECEIPTIT',W/2,y+18);y+=35;
-    ctx.font='13px "Outfit",sans-serif';ctx.fillStyle='#7a78a8';ctx.fillText('Ticket du jour',W/2,y);y+=18;
-    ctx.fillText('📅 '+new Date().toLocaleDateString('fr-FR'),W/2,y);y+=25;
-    ctx.strokeStyle='#8b5cf6';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(P,y);ctx.lineTo(W-P,y);ctx.stroke();y+=18;
-    ctx.textAlign='left';ctx.fillStyle='#2d2b55';
-    function drawSection(title,items,pfn){if(!items.length)return;ctx.font='bold 12px "Outfit",sans-serif';ctx.fillText(title,P,y);y+=20;ctx.font='11px "Space Mono",monospace';items.forEach(i=>{ctx.fillText('• '+(i.lessonName||i.exerciseName||i.label||'Focus'),P+8,y);ctx.fillStyle='#34d399';ctx.fillText('+'+pfn(i)+' pts',W-P-55,y);ctx.fillStyle='#2d2b55';y+=20;});y+=6;}
-    drawSection('📚 LEÇONS',lessons,l=>l.points);
-    drawSection('✏️ EXERCICES',exercises,ex=>ex.points);
-    drawSection('⏱️ POMODOROS',pomodoros,p=>p.points);
+    ctx.fillStyle='#2d2b55';ctx.font='bold 20px "Space Mono",monospace';ctx.textAlign='center';ctx.fillText('🧾 RECEIPTIT',W/2,y+18);y+=35;
+    ctx.font='13px "Outfit",sans-serif';ctx.fillStyle='#7a78a8';ctx.fillText('Ticket du jour',W/2,y);y+=18;ctx.fillText('📅 '+new Date().toLocaleDateString('fr-FR'),W/2,y);y+=25;
+    ctx.strokeStyle='#8b5cf6';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(P,y);ctx.lineTo(W-P,y);ctx.stroke();y+=18;ctx.textAlign='left';ctx.fillStyle='#2d2b55';
+    function ds(title,items,pfn){if(!items.length)return;ctx.font='bold 12px "Outfit",sans-serif';ctx.fillText(title,P,y);y+=20;ctx.font='11px "Space Mono",monospace';items.forEach(i=>{ctx.fillText('• '+(i.lessonName||i.exerciseName||i.label||'Focus'),P+8,y);ctx.fillStyle='#34d399';ctx.fillText('+'+pfn(i)+' pts',W-P-55,y);ctx.fillStyle='#2d2b55';y+=20;});y+=6;}
+    ds('📚 LEÇONS',lessons,l=>l.points);ds('✏️ EXERCICES',exercises,ex=>ex.points);ds('⏱️ POMODOROS',pomodoros,p=>p.points);
     if(packs.length){ctx.font='bold 12px "Outfit",sans-serif';ctx.fillText('🎁 PACKS',P,y);y+=20;ctx.font='11px "Space Mono",monospace';packs.forEach(p=>{ctx.fillText('• '+p.name+' ('+(p.rarity||'?')+')',P+8,y);ctx.fillStyle='#f87171';ctx.fillText('-100 pts',W-P-55,y);ctx.fillStyle='#2d2b55';y+=20;});y+=6;}
     ctx.strokeStyle='#8b5cf6';ctx.beginPath();ctx.moveTo(P,y);ctx.lineTo(W-P,y);ctx.stroke();y+=16;
-    ctx.font='bold 13px "Outfit",sans-serif';ctx.fillStyle='#34d399';ctx.fillText('💰 Gagnés : +'+earned+' pts',P,y);y+=20;
-    ctx.fillStyle='#f87171';ctx.fillText('💸 Dépensés : -'+spent+' pts',P,y);y+=20;
+    ctx.font='bold 13px "Outfit",sans-serif';ctx.fillStyle='#34d399';ctx.fillText('💰 Gagnés : +'+earned+' pts',P,y);y+=20;ctx.fillStyle='#f87171';ctx.fillText('💸 Dépensés : -'+spent+' pts',P,y);y+=20;
     let bal=earned-spent;ctx.fillStyle=bal>=0?'#34d399':'#f87171';ctx.fillText('⭐ Solde : '+(bal>=0?'+':'')+bal+' pts',P,y);y+=20;
-    ctx.fillStyle='#2d2b55';ctx.fillText('🔥 Streak : '+state.streak+'j (×'+getStreakMultiplier().toFixed(1)+')',P,y);y+=20;
-    ctx.fillText('🧾 Total : '+state.points+' pts',P,y);y+=25;
-    ctx.textAlign='center';ctx.font='italic 11px "Outfit",sans-serif';ctx.fillStyle='#a8a6c8';
-    ctx.fillText('Merci d\'avoir bossé ! 💪',W/2,y);y+=16;ctx.fillText('RECEIPTIT - Ton taff en ticket 🧾',W/2,y);
-    ticketImageData=c.toDataURL('image/png');
-    document.getElementById('ticket-modal').classList.add('active');
+    ctx.fillStyle='#2d2b55';ctx.fillText('🔥 Streak : '+state.streak+'j (×'+getStreakMultiplier().toFixed(1)+')',P,y);y+=20;ctx.fillText('🧾 Total : '+state.points+' pts',P,y);y+=25;
+    ctx.textAlign='center';ctx.font='italic 11px "Outfit",sans-serif';ctx.fillStyle='#a8a6c8';ctx.fillText('Merci d\'avoir bossé ! 💪',W/2,y);y+=16;ctx.fillText('RECEIPTIT - Ton taff en ticket 🧾',W/2,y);
+    ticketImageData=c.toDataURL('image/png');document.getElementById('ticket-modal').classList.add('active');
     let pp=document.getElementById('printer-paper');pp.style.animation='none';pp.offsetHeight;pp.style.animation='paperSlide 1.5s ease-out forwards';
 }
 
 function closeTicket(){document.getElementById('ticket-modal').classList.remove('active');}
 async function shareTicket(){if(!ticketImageData)return;let blob=await(await fetch(ticketImageData)).blob();let file=new File([blob],'ticket.png',{type:'image/png'});if(navigator.share&&navigator.canShare({files:[file]})){await navigator.share({title:'🧾 Ticket',files:[file]});}else{await navigator.clipboard.writeText('🧾 Ticket');showToast('📋 Copié !');}}
-function printTicket(){let c=document.getElementById('ticket-canvas');let w=window.open('','_blank');w.document.write('<img src="'+c.toDataURL('image/png')+'" style="max-width:100%;">');w.document.title='Ticket';w.print();}
+function printTicket(){let c=document.getElementById('ticket-canvas'),w=window.open('','_blank');w.document.write('<img src="'+c.toDataURL('image/png')+'" style="max-width:100%;">');w.document.title='Ticket';w.print();}
 function showToast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
 document.addEventListener('DOMContentLoaded',async()=>{await loadData();updateUI();if(localStorage.getItem('receiptit_show_ticket_'+currentUser)==='true'){setTimeout(()=>showTicket(),600);localStorage.setItem('receiptit_show_ticket_'+currentUser,'false');}});
