@@ -42,142 +42,37 @@
 <form id="forgot-form" style="display:none;" onsubmit="handleForgot(event)">
 <p style="text-align:center;color:var(--text-dim);margin-bottom:16px;font-size:0.9rem;">Entre ton pseudo pour récupérer ton compte.</p>
 <div class="input-group"><label>👤 Nom d'utilisateur</label><input type="text" id="forgot-username" placeholder="Ton pseudo..." maxlength="30" required></div>
-<div id="forgot-section" style="display:none;">
-<div class="card" style="text-align:center;margin-top:12px;">
-<p style="color:var(--text-dim);margin-bottom:6px;">Ta question :</p>
-<p style="font-weight:700;color:var(--accent);margin-bottom:12px;" id="forgot-question-text"></p>
-<div class="input-group"><label>✍️ Réponse</label><input type="text" id="forgot-answer" placeholder="Réponse..." maxlength="50"></div>
-<div id="forgot-new-section" style="display:none;">
-<div class="input-group"><label>🔒 Nouveau</label><input type="password" id="forgot-new-pw" placeholder="Nouveau..." maxlength="50"></div>
-<div class="input-group"><label>🔒 Confirmer</label><input type="password" id="forgot-new-confirm" placeholder="Confirme..." maxlength="50"></div>
-</div></div></div>
+<div id="forgot-section" style="display:none;"><div class="card" style="text-align:center;margin-top:12px;"><p style="color:var(--text-dim);margin-bottom:6px;">Ta question :</p><p style="font-weight:700;color:var(--accent);margin-bottom:12px;" id="forgot-question-text"></p><div class="input-group"><label>✍️ Réponse</label><input type="text" id="forgot-answer" placeholder="Réponse..." maxlength="50"></div><div id="forgot-new-section" style="display:none;"><div class="input-group"><label>🔒 Nouveau</label><input type="password" id="forgot-new-pw" placeholder="Nouveau..." maxlength="50"></div><div class="input-group"><label>🔒 Confirmer</label><input type="password" id="forgot-new-confirm" placeholder="Confirme..." maxlength="50"></div></div></div></div>
 <button type="submit" class="btn-primary" id="forgot-btn">Vérifier</button>
 </form>
 
 </div></div></div>
-
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script>
 const SUPABASE_URL='https://fonraobtmkaallsjxtoj.supabase.co';
 const SUPABASE_KEY='sb_publishable_QxU-Ql1Mux18PlLjGady5g_gwkTCKSH';
-let supabase=null,supabaseOnline=false;
-(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);supabaseOnline=true}catch(e){supabaseOnline=false}})();
+let supabase=null;
+(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);console.log('✅ Supabase OK');}catch(e){console.error('❌ Supabase error:',e);}})();
 
 let cm='login',fs=0,fu='';
 
-function switchTab(m){
-cm=m;fs=0;
-document.querySelectorAll('.login-tab').forEach(t=>t.classList.remove('active'));
-document.querySelector('[onclick*="'+m+'"]').classList.add('active');
-document.getElementById('login-form').style.display=m==='login'?'block':'none';
-document.getElementById('register-form').style.display=m==='register'?'block':'none';
-document.getElementById('forgot-form').style.display=m==='forgot'?'block':'none';
-document.getElementById('error-msg').classList.remove('show');
-document.getElementById('forgot-section').style.display='none';
-document.getElementById('forgot-new-section').style.display='none';
-document.getElementById('forgot-btn').textContent='Vérifier';
-}
-
+function switchTab(m){cm=m;fs=0;document.querySelectorAll('.login-tab').forEach(t=>t.classList.remove('active'));document.querySelector('[onclick*="'+m+'"]').classList.add('active');document.getElementById('login-form').style.display=m==='login'?'block':'none';document.getElementById('register-form').style.display=m==='register'?'block':'none';document.getElementById('forgot-form').style.display=m==='forgot'?'block':'none';document.getElementById('error-msg').classList.remove('show');document.getElementById('forgot-section').style.display='none';document.getElementById('forgot-new-section').style.display='none';document.getElementById('forgot-btn').textContent='Vérifier';}
 function showError(m){let e=document.getElementById('error-msg');e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),4000);}
 function showToast(m){let t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-function hash(p,u){let h=0;let s=p+'rct_'+u;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h&=h;}return Math.abs(h).toString(36);}
+function hash(p,u){let h=0,s=p+'rct_'+u;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h&=h;}return Math.abs(h).toString(36);}
 function norm(a){return a.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');}
 
-async function loginSuccess(u){
-localStorage.setItem('receiptit_logged_user',u);
-localStorage.setItem('receiptit_user_id','user_'+Math.random().toString(36).substr(2,9)+'_'+Date.now());
-if(supabaseOnline)try{await supabase.from('receiptit_users').update({last_login:new Date().toISOString()}).eq('username',u)}catch(e){}
-location.href='index.html';
-}
+async function loginSuccess(u){localStorage.setItem('receiptit_logged_user',u);localStorage.setItem('receiptit_user_id','user_'+Math.random().toString(36).substr(2,9)+'_'+Date.now());try{await supabase.from('receiptit_users').update({last_login:new Date().toISOString()}).eq('username',u);}catch(e){}if(u==='admin'){location.href='admin.html';}else{location.href='index.html';}}
 
-async function handleLogin(e){
-e.preventDefault();
-let u=document.getElementById('login-username').value.trim().toLowerCase();
-let p=document.getElementById('login-password').value;
-if(!u||!p){showError('Remplis tous les champs !');return;}
-let hh=hash(p,u);
-if(supabaseOnline){
-try{let{data,error}=await supabase.from('receiptit_users').select('*').eq('username',u).single();
-if(!error&&data){if(data.password_hash===hh){await loginSuccess(u);return;}else{showError('Mot de passe incorrect !');return;}}}catch(e){}}
-let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');
-let user=users[u];
-if(!user){showError('Utilisateur introuvable ! Crée un compte.');return;}
-if(user.password!==hh){showError('Mot de passe incorrect !');return;}
-await loginSuccess(u);
-}
+async function handleLogin(e){e.preventDefault();let u=document.getElementById('login-username').value.trim().toLowerCase();let p=document.getElementById('login-password').value;if(!u||!p){showError('Remplis tout !');return;}let hh=hash(p,u);try{let{data,error}=await supabase.from('receiptit_users').select('*').eq('username',u).single();if(!error&&data){if(data.password_hash===hh){await loginSuccess(u);return;}else{showError('Mot de passe incorrect !');return;}}}catch(e){}let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}'),user=users[u];if(!user){showError('Utilisateur introuvable !');return;}if(user.password!==hh){showError('Mot de passe incorrect !');return;}await loginSuccess(u);}
 
-async function handleRegister(e){
-e.preventDefault();
-let u=document.getElementById('reg-username').value.trim().toLowerCase();
-let p=document.getElementById('reg-password').value;
-let c=document.getElementById('reg-confirm').value;
-let q=document.getElementById('reg-question').value;
-let a=document.getElementById('reg-answer').value.trim();
-if(!u||!p||!q||!a){showError('Remplis tous les champs !');return;}
-if(u.length<2){showError('Pseudo trop court (min 2)');return;}
-if(p.length<4){showError('Mot de passe trop court (min 4)');return;}
-if(p!==c){showError('Les mots de passe ne correspondent pas !');return;}
-let hh=hash(p,u);let na=norm(a);let cd=new Date().toLocaleDateString('fr-FR');
-let uid='user_'+Math.random().toString(36).substr(2,9)+'_'+Date.now();
-let ud={user_id:uid,username:u,password_hash:hh,security_question:q,security_answer:na,two_fa_enabled:false,points:0,sessions:[],inventory:{},packs_opened:0,total_sessions:0,streak:0,pack_history:[],equipped_stickers:[],sticker_wall:[],friends:[],followers:[],following:[],avatar_emoji:'👤',creation_date:cd,last_login:new Date().toISOString(),created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
-if(supabaseOnline){
-try{let{data:ex}=await supabase.from('receiptit_users').select('username').eq('username',u).single();
-if(ex){showError('Ce pseudo existe déjà !');return;}
-let{error}=await supabase.from('receiptit_users').insert(ud);
-if(error){showError('Erreur Supabase: '+error.message);return;}
-await loginSuccess(u);showToast('🎉 Compte créé avec succès !');return;}catch(e){}}
-let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');
-if(users[u]){showError('Ce pseudo existe déjà !');return;}
-users[u]={password:hh,securityQuestion:q,securityAnswer:na,creationDate:cd,lastLogin:new Date().toISOString()};
-localStorage.setItem('receiptit_users',JSON.stringify(users));
-await loginSuccess(u);showToast('🎉 Compte créé !');
-}
+async function handleRegister(e){e.preventDefault();let u=document.getElementById('reg-username').value.trim().toLowerCase();let p=document.getElementById('reg-password').value,c=document.getElementById('reg-confirm').value;let q=document.getElementById('reg-question').value,a=document.getElementById('reg-answer').value.trim();if(!u||!p||!q||!a){showError('Remplis tout !');return;}if(u.length<2){showError('Pseudo trop court !');return;}if(p.length<4){showError('Mot de passe trop court !');return;}if(p!==c){showError('Mots de passe différents !');return;}let hh=hash(p,u),na=norm(a),cd=new Date().toLocaleDateString('fr-FR');let uid='user_'+Math.random().toString(36).substr(2,9)+'_'+Date.now();let ud={user_id:uid,username:u,password_hash:hh,security_question:q,security_answer:na,two_fa_enabled:false,points:0,sessions:[],inventory:{},packs_opened:0,total_sessions:0,streak:0,pack_history:[],equipped_stickers:[],sticker_wall:[],avatar_emoji:'👤',profile_pic:null,friends:[],followers:[],following:[],creation_date:cd,last_login:new Date().toISOString(),created_at:new Date().toISOString(),updated_at:new Date().toISOString()};try{let{data:ex}=await supabase.from('receiptit_users').select('username').eq('username',u).single();if(ex){showError('Ce pseudo existe déjà !');return;}let{error}=await supabase.from('receiptit_users').insert(ud);if(error){showError('Erreur: '+error.message);return;}await loginSuccess(u);showToast('🎉 Compte créé !');return;}catch(e){}let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');if(users[u]){showError('Ce pseudo existe déjà !');return;}users[u]={password:hh,securityQuestion:q,securityAnswer:na,creationDate:cd,lastLogin:new Date().toISOString()};localStorage.setItem('receiptit_users',JSON.stringify(users));await loginSuccess(u);showToast('🎉 Compte créé !');}
 
-async function handleForgot(e){
-e.preventDefault();
-let u=document.getElementById('forgot-username').value.trim().toLowerCase();
-if(!u){showError('Entre ton pseudo !');return;}
-if(fs===0){
-let user=null;
-if(supabaseOnline)try{let{data}=await supabase.from('receiptit_users').select('*').eq('username',u).single();user=data;}catch(e){}
-if(!user){let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');user=users[u];}
-if(!user){showError('Utilisateur introuvable !');return;}
-fu=u;fs=1;
-document.getElementById('forgot-section').style.display='block';
-document.getElementById('forgot-question-text').textContent=user.security_question||user.securityQuestion;
-document.getElementById('forgot-btn').textContent='Vérifier la réponse';
-document.getElementById('forgot-username').disabled=true;
-return;}
-if(fs===1){
-let a=document.getElementById('forgot-answer').value;
-if(!a){showError('Réponds à la question !');return;}
-let user=null;
-if(supabaseOnline)try{let{data}=await supabase.from('receiptit_users').select('*').eq('username',fu).single();user=data;}catch(e){}
-if(!user){let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');user=users[fu];}
-if(norm(a)!==(user.security_answer||user.securityAnswer)){showError('Réponse incorrecte !');return;}
-fs=2;
-document.getElementById('forgot-new-section').style.display='block';
-document.getElementById('forgot-btn').textContent='Changer le mot de passe';
-document.getElementById('forgot-answer').disabled=true;
-return;}
-if(fs===2){
-let p=document.getElementById('forgot-new-pw').value;
-let cf=document.getElementById('forgot-new-confirm').value;
-if(!p||p.length<4){showError('Mot de passe trop court (min 4)');return;}
-if(p!==cf){showError('Les mots de passe ne correspondent pas !');return;}
-let hh=hash(p,fu);
-if(supabaseOnline)try{await supabase.from('receiptit_users').update({password_hash:hh,updated_at:new Date().toISOString()}).eq('username',fu)}catch(e){}
-let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');
-if(users[fu]){users[fu].password=hh;localStorage.setItem('receiptit_users',JSON.stringify(users));}
-showToast('🎉 Mot de passe changé !');
-switchTab('login');document.getElementById('login-username').value=fu;}
-}
+async function handleForgot(e){e.preventDefault();let u=document.getElementById('forgot-username').value.trim().toLowerCase();if(!u){showError('Entre ton pseudo !');return;}if(fs===0){let user=null;try{let{data}=await supabase.from('receiptit_users').select('*').eq('username',u).single();user=data;}catch(e){}if(!user){showError('Introuvable !');return;}fu=u;fs=1;document.getElementById('forgot-section').style.display='block';document.getElementById('forgot-question-text').textContent=user.security_question;document.getElementById('forgot-btn').textContent='Vérifier';document.getElementById('forgot-username').disabled=true;return;}if(fs===1){let a=document.getElementById('forgot-answer').value;if(!a){showError('Réponds !');return;}let user=null;try{let{data}=await supabase.from('receiptit_users').select('*').eq('username',fu).single();user=data;}catch(e){}if(norm(a)!==user.security_answer){showError('Réponse incorrecte !');return;}fs=2;document.getElementById('forgot-new-section').style.display='block';document.getElementById('forgot-btn').textContent='Changer';document.getElementById('forgot-answer').disabled=true;return;}if(fs===2){let p=document.getElementById('forgot-new-pw').value,cf=document.getElementById('forgot-new-confirm').value;if(!p||p.length<4){showError('Trop court !');return;}if(p!==cf){showError('Différents !');return;}let hh=hash(p,fu);try{await supabase.from('receiptit_users').update({password_hash:hh,updated_at:new Date().toISOString()}).eq('username',fu);}catch(e){}showToast('🎉 Mot de passe changé !');switchTab('login');document.getElementById('login-username').value=fu;}}
 
-document.addEventListener('DOMContentLoaded',()=>{
-if(localStorage.getItem('receiptit_logged_user'))location.href='index.html';
-});
+document.addEventListener('DOMContentLoaded',()=>{if(localStorage.getItem('receiptit_logged_user'))location.href='index.html';});
 </script>
 </body>
 </html>
