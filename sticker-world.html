@@ -6,220 +6,88 @@
     <title>Receiptit - Sticker World</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .collapsible-header { display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 16px;background:linear-gradient(135deg,var(--accent-pale),white);border-radius:14px;border:2px solid var(--accent);margin-bottom:8px; }
-        .collapsible-body { display:none;padding:0 8px 8px; }
-        .collapsible-body.open { display:block; }
-        .sw-grid { display:grid;grid-template-columns:repeat(6,1fr);gap:6px; }
-        .sw-item { text-align:center;font-size:1.8rem;padding:8px;background:rgba(139,92,246,0.06);border-radius:10px;cursor:pointer;position:relative; }
-        .sw-item.selected { background:rgba(139,92,246,0.15);box-shadow:0 0 0 2px var(--accent); }
-        .sw-item .remove-badge { position:absolute;top:2px;right:2px;background:var(--danger);color:white;width:18px;height:18px;border-radius:50%;font-size:0.6rem;display:flex;align-items:center;justify-content:center;cursor:pointer; }
-    </style>
+    <style>.collapsible-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:12px 16px;background:linear-gradient(135deg,var(--accent-pale),white);border-radius:14px;border:2px solid var(--accent);margin-bottom:8px;}.collapsible-body{display:none;padding:0 8px 8px;}.collapsible-body.open{display:block;}.sw-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}.sw-item{text-align:center;font-size:1.8rem;padding:8px;background:rgba(139,92,246,0.06);border-radius:10px;cursor:pointer;position:relative;}.sw-item.in-wall{background:rgba(139,92,246,0.15);box-shadow:0 0 0 2px var(--accent);}</style>
 </head>
 <body>
-    <div class="bg-blob blob-1"></div>
-    <div class="bg-blob blob-2"></div>
-    <div class="bg-blob blob-3"></div>
+<div class="bg-blob blob-1"></div><div class="bg-blob blob-2"></div><div class="bg-blob blob-3"></div>
 
-    <nav class="navbar">
-        <div class="navbar-brand" onclick="location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
-        <div class="navbar-actions">
-            <a href="inventory.html" class="navbar-link">🎒</a>
-            <a href="sticker-world.html" class="navbar-link" style="color:var(--accent);">🌍</a>
-            <a href="friends.html" class="navbar-link">👥</a>
-            <a href="trades.html" class="navbar-link">🔄</a>
-            <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
-        </div>
-    </nav>
+<nav class="navbar">
+    <div class="navbar-brand" onclick="location.href='index.html'">RECEIPTIT</div>
+    <div class="navbar-actions">
+        <a href="inventory.html" class="navbar-link">🎒</a><a href="sticker-world.html" class="navbar-link" style="color:var(--accent);">🌍</a>
+        <a href="friends.html" class="navbar-link">👥</a><a href="trades.html" class="navbar-link">🔄</a>
+        <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
+    </div>
+</nav>
 
-    <div class="main-content">
-        <!-- MON STICKER WALL (rétractable) -->
-        <div class="collapsible-header" onclick="toggleMyWall()">
-            <span>🏷️ <strong>Mon Sticker Wall</strong> <span id="wall-count" style="font-size:0.8rem;color:var(--text-dim);"></span></span>
-            <span id="wall-arrow" style="transition:transform 0.2s;">▼</span>
-        </div>
-        <div class="collapsible-body" id="my-wall-body">
-            <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">Clique sur un sticker pour l'ajouter/retirer. Les 6 premiers sont visibles par tous.</p>
-            <div class="sw-grid" id="my-wall-grid"></div>
-        </div>
-
-        <!-- AMIS (follows mutuels) -->
-        <div class="section-title">⭐ Mes amis</div>
-        <div id="friends-section"><p style="color:var(--text-dim);font-size:0.8rem;">Chargement...</p></div>
-
-        <!-- AUTRES -->
-        <div class="section-title">🔍 Autres utilisateurs</div>
-        <div style="display:flex;gap:8px;margin-bottom:12px;">
-            <input type="text" id="search-input" placeholder="Rechercher..." style="flex:1;padding:10px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);font-family:'Outfit',sans-serif;font-size:0.85rem;outline:none;" oninput="renderOthers()">
-        </div>
-        <div id="others-section"><p style="color:var(--text-dim);font-size:0.8rem;">Chargement...</p></div>
+<div class="main-content">
+    <!-- MON STICKER WALL -->
+    <div class="collapsible-header" onclick="toggleMyWall()">
+        <span>🏷️ <strong>Mon Sticker Wall</strong> <span id="wall-count" style="font-size:0.8rem;color:var(--text-dim);"></span></span>
+        <span id="wall-arrow">▼</span>
+    </div>
+    <div class="collapsible-body" id="my-wall-body">
+        <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">Clique pour ajouter/retirer. Les 6 premiers visibles par tous.</p>
+        <div class="sw-grid" id="my-wall-grid"></div>
     </div>
 
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
-        <a href="pomodoro.html" class="nav-item"><span class="nav-icon">⏱️</span><span class="nav-label">Focus</span></a>
-        <a href="session.html" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Session</span></a>
-        <a href="pack.html" class="nav-item"><span class="nav-icon">🎁</span><span class="nav-label">Pack</span></a>
-        <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
-    </nav>
+    <!-- AMIS -->
+    <div class="section-title">⭐ Mes amis</div>
+    <div id="friends-section"></div>
 
-    <!-- MODAL : voir tous les stickers d'un utilisateur -->
-    <div class="modal-overlay" id="profile-modal">
-        <div class="modal-content" style="max-width:400px;max-height:80vh;overflow-y:auto;padding:24px;text-align:center;">
-            <div style="font-size:3rem;" id="modal-avatar-display">👤</div>
-            <div class="modal-name" id="modal-username">@user</div>
-            <div style="display:flex;gap:10px;justify-content:center;margin:8px 0;font-size:0.8rem;">
-                <span>⭐ <strong id="modal-points">0</strong></span>
-                <span>🔥 <strong id="modal-streak">0</strong>j</span>
-            </div>
-            <p style="font-size:0.8rem;color:var(--text-dim);font-weight:600;margin-top:12px;">🏷️ Sticker Wall complet</p>
-            <div id="modal-full-wall" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;"></div>
-            <button class="modal-btn" style="margin-top:16px;" onclick="closeProfileModal()">Fermer</button>
-        </div>
-    </div>
+    <!-- AUTRES -->
+    <div class="section-title">🔍 Autres</div>
+    <input type="text" id="search-input" placeholder="Rechercher..." style="width:100%;padding:10px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);font-family:'Outfit',sans-serif;font-size:0.85rem;margin-bottom:12px;" oninput="renderOthers()">
+    <div id="others-section"></div>
+</div>
 
-    <div class="toast" id="toast"></div>
+<nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
+    <a href="pomodoro.html" class="nav-item"><span class="nav-icon">⏱️</span><span class="nav-label">Focus</span></a>
+    <a href="session.html" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Session</span></a>
+    <a href="pack.html" class="nav-item"><span class="nav-icon">🎁</span><span class="nav-label">Pack</span></a>
+    <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
+</nav>
 
-    <script src="config.js"></script>
-    <script>
-        const currentUser = localStorage.getItem('receiptit_logged_user');
-        if (!currentUser) location.href = 'login.html';
+<div class="modal-overlay" id="profile-modal"><div class="modal-content" style="max-width:400px;max-height:80vh;overflow-y:auto;text-align:center;"><div style="font-size:3rem;" id="modal-avatar-display">👤</div><div class="modal-name" id="modal-username">@user</div><div style="display:flex;gap:10px;justify-content:center;margin:8px 0;font-size:0.8rem;"><span>⭐ <strong id="modal-points">0</strong></span><span>🔥 <strong id="modal-streak">0</strong>j</span></div><p style="font-size:0.8rem;color:var(--text-dim);font-weight:600;margin-top:12px;">🏷️ Sticker Wall complet</p><div id="modal-full-wall" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;"></div><button class="btn-primary" style="margin-top:16px;" id="modal-friend-btn" onclick="sendFriendRequest()">👥 Demande d'ami</button><button class="modal-btn secondary" onclick="closeProfileModal()">Fermer</button></div></div>
+<div class="toast" id="toast"></div>
 
-        let myState = { points:0,inventory:{},stickerWall:[],avatarEmoji:'👤',profilePic:null,following:[],followers:[] };
-        let allUsers = [];
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL='https://fonraobtmkaallsjxtoj.supabase.co';
+const SUPABASE_KEY='sb_publishable_QxU-Ql1Mux18PlLjGady5g_gwkTCKSH';
+let supabase=null,supabaseOnline=false;
+(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);supabaseOnline=true;}catch(e){}})();
 
-        function loadMyState() {
-            const s = localStorage.getItem('receiptit_state_'+currentUser);
-            if (s) try { myState = {...myState,...JSON.parse(s)}; if(!myState.stickerWall)myState.stickerWall=[]; } catch(e) {}
-        }
+const currentUser=localStorage.getItem('receiptit_logged_user');
+if(!currentUser)location.href='login.html';
 
-        function saveMyState() {
-            const existing = JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}');
-            existing.stickerWall = myState.stickerWall;
-            localStorage.setItem('receiptit_state_'+currentUser, JSON.stringify(existing));
-        }
+let myState={points:0,inventory:{},stickerWall:[],avatarEmoji:'👤',profilePic:null,friends:[],following:[]};
+let allUsers=[];
+let selectedUser=null;
+let friendRequests=JSON.parse(localStorage.getItem('receiptit_friend_requests')||'[]');
 
-        function loadAllUsers() {
-            const users = JSON.parse(localStorage.getItem('receiptit_users')||'{}');
-            allUsers = [];
-            Object.keys(users).forEach(u => {
-                const s = localStorage.getItem('receiptit_state_'+u);
-                if (s) try {
-                    const st = JSON.parse(s);
-                    allUsers.push({ username:u, points:st.points||0, streak:st.streak||0, stickerWall:st.stickerWall||[], avatarEmoji:st.avatarEmoji||'👤', profilePic:st.profilePic||null, inventory:st.inventory||{}, followers:st.followers||[], following:st.following||[] });
-                } catch(e) {}
-            });
-        }
+function loadMyState(){let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{myState={...myState,...JSON.parse(s)};if(!myState.stickerWall)myState.stickerWall=[];}catch(e){}}
+function saveMyState(){let s=JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}');s.stickerWall=myState.stickerWall;localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(s));}
 
-        // ============ MON WALL RÉTRACTABLE ============
-        function toggleMyWall() {
-            const body = document.getElementById('my-wall-body');
-            const arrow = document.getElementById('wall-arrow');
-            body.classList.toggle('open');
-            arrow.textContent = body.classList.contains('open') ? '▲' : '▼';
-            if (body.classList.contains('open')) renderMyWallGrid();
-        }
+function loadAllUsers(){let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');allUsers=[];Object.keys(users).forEach(u=>{let s=localStorage.getItem('receiptit_state_'+u);if(s)try{let st=JSON.parse(s);allUsers.push({username:u,points:st.points||0,streak:st.streak||0,stickerWall:st.stickerWall||[],avatarEmoji:st.avatarEmoji||'👤',profilePic:st.profilePic||null,inventory:st.inventory||{},friends:st.friends||[],followers:st.followers||[],following:st.following||[]});}catch(e){}});}
 
-        function renderMyWallGrid() {
-            const grid = document.getElementById('my-wall-grid');
-            const items = Object.entries(myState.inventory).map(([k,v]) => ({key:k,...v}));
-            document.getElementById('wall-count').textContent = '('+myState.stickerWall.length+' stickers)';
+function toggleMyWall(){let b=document.getElementById('my-wall-body'),a=document.getElementById('wall-arrow');b.classList.toggle('open');a.textContent=b.classList.contains('open')?'▲':'▼';if(b.classList.contains('open'))renderMyWallGrid();}
+function renderMyWallGrid(){let g=document.getElementById('my-wall-grid'),items=Object.entries(myState.inventory).map(([k,v])=>({key:k,...v}));document.getElementById('wall-count').textContent='('+myState.stickerWall.length+' stickers)';if(!items.length){g.innerHTML='<div style="grid-column:span 6;text-align:center;color:var(--text-light);">Pas de stickers.</div>';return;}g.innerHTML=items.map(item=>{let inWall=myState.stickerWall.includes(item.key);return'<div class="sw-item '+(inWall?'in-wall':'')+'" onclick="toggleWallSticker(\''+item.key.replace(/'/g,"\\'")+'\')">'+item.i+(inWall?'<span style="position:absolute;top:2px;right:2px;font-size:0.6rem;">✅</span>':'')+'<div style="font-size:0.55rem;">'+item.n+'</div></div>';}).join('');}
+function toggleWallSticker(key){let idx=myState.stickerWall.indexOf(key);if(idx>-1)myState.stickerWall.splice(idx,1);else myState.stickerWall.push(key);saveMyState();renderMyWallGrid();renderAll();}
 
-            if (!items.length) {
-                grid.innerHTML = '<div style="grid-column:span 6;text-align:center;color:var(--text-light);padding:20px;">Pas encore de stickers. Ouvre des packs !</div>';
-                return;
-            }
+function renderAll(){let mutuals=allUsers.filter(u=>u.username!==currentUser&&(myState.friends||[]).includes(u.username));document.getElementById('friends-section').innerHTML=mutuals.length?mutuals.map(u=>renderUserCard(u)).join(''):'<p style="color:var(--text-dim);">Aucun ami.</p>';renderOthers();}
+function renderUserCard(u){let preview=(u.stickerWall||[]).slice(0,6),inv=u.inventory||{};return'<div class="card" style="cursor:pointer;" onclick="showFullWall(\''+u.username+'\')"><div style="display:flex;align-items:center;gap:12px;"><div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;overflow:hidden;">'+(u.profilePic?'<img src="'+u.profilePic+'" style="width:100%;height:100%;object-fit:cover;">':(u.avatarEmoji||'👤'))+'</div><div style="flex:1;"><strong>@'+u.username+'</strong><div style="font-size:0.7rem;color:var(--text-dim);">⭐'+u.points+' · 🔥'+u.streak+'j</div></div><span style="font-size:1.2rem;color:var(--text-light);">→</span></div>'+(preview.length?'<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;">'+preview.map(sk=>{let item=inv[sk];return item?'<span style="font-size:1.2rem;">'+item.i+'</span>':'';}).join('')+'</div>':'')+'</div>';}
+function renderOthers(){let s=document.getElementById('search-input')?.value?.toLowerCase()||'';let mutuals=allUsers.filter(u=>u.username!==currentUser&&(myState.friends||[]).includes(u.username));let others=allUsers.filter(u=>u.username!==currentUser&&!mutuals.includes(u)&&u.username.includes(s));document.getElementById('others-section').innerHTML=others.length?others.map(u=>renderUserCard(u)).join(''):'<p style="color:var(--text-dim);">Aucun.</p>';}
 
-            grid.innerHTML = items.map(item => {
-                const inWall = myState.stickerWall.includes(item.key);
-                return `<div class="sw-item ${inWall?'selected':''}" onclick="toggleWallSticker('${item.key.replace(/'/g,"\\'")}')">
-                    ${item.i||item.icon}
-                    ${inWall ? '<span class="remove-badge">×</span>' : ''}
-                    <div style="font-size:0.55rem;color:var(--text-dim);">${item.n||item.name}</div>
-                    <div style="font-size:0.5rem;">x${item.count}</div>
-                </div>`;
-            }).join('');
-        }
+function showFullWall(u){selectedUser=u;let user=allUsers.find(p=>p.username===u);if(!user)return;document.getElementById('modal-username').textContent='@'+u;document.getElementById('modal-points').textContent=user.points;document.getElementById('modal-streak').textContent=user.streak;document.getElementById('modal-avatar-display').innerHTML=user.profilePic?'<img src="'+user.profilePic+'" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">':(user.avatarEmoji||'👤');let wall=user.stickerWall||[],inv=user.inventory||{};document.getElementById('modal-full-wall').innerHTML=wall.length?wall.map(sk=>{let item=inv[sk];return item?'<div style="text-align:center;font-size:2rem;padding:6px;">'+item.i+'<div style="font-size:0.6rem;">'+item.n+'</div></div>':'';}).join(''):'<span style="color:var(--text-light);">Wall vide</span>';let btn=document.getElementById('modal-friend-btn');if(u===currentUser){btn.style.display='none';}else{btn.style.display='block';let isFriend=(myState.friends||[]).includes(u);let isPending=friendRequests.find(r=>r.from===currentUser&&r.to===u&&r.status==='pending');btn.textContent=isFriend?'✅ Ami':(isPending?'⏳ En attente':'👥 Demande d\'ami');btn.style.background=isFriend?'var(--success)':'';}document.getElementById('profile-modal').classList.add('active');}
 
-        function toggleWallSticker(key) {
-            const idx = myState.stickerWall.indexOf(key);
-            if (idx > -1) {
-                myState.stickerWall.splice(idx, 1);
-            } else {
-                myState.stickerWall.push(key);
-            }
-            saveMyState();
-            renderMyWallGrid();
-            renderAllSections();
-        }
+function sendFriendRequest(){if(!selectedUser||selectedUser===currentUser)return;let isFriend=(myState.friends||[]).includes(selectedUser);if(isFriend){showToast('⚠️ Déjà ami !');return;}let already=friendRequests.find(r=>r.from===currentUser&&r.to===selectedUser&&r.status==='pending');if(already){showToast('⚠️ Déjà envoyé !');return;}friendRequests.push({from:currentUser,to:selectedUser,status:'pending',date:new Date().toISOString()});localStorage.setItem('receiptit_friend_requests',JSON.stringify(friendRequests));showToast('✅ Demande envoyée !');closeProfileModal();}
+function closeProfileModal(){document.getElementById('profile-modal').classList.remove('active');selectedUser=null;}
+function showToast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-        // ============ AFFICHAGE ============
-        function renderAllSections() {
-            const mutuals = allUsers.filter(u => u.username!==currentUser && myState.following.includes(u.username) && u.followers.includes(currentUser));
-            const others = allUsers.filter(u => u.username!==currentUser && !mutuals.includes(u));
-
-            // AMIS
-            document.getElementById('friends-section').innerHTML = mutuals.length ? mutuals.map(u => renderUserCard(u)).join('') : '<p style="color:var(--text-dim);font-size:0.8rem;">Aucun ami pour le moment.</p>';
-
-            // AUTRES
-            renderOthers();
-        }
-
-        function renderUserCard(u) {
-            const wallPreview = (u.stickerWall||[]).slice(0, 6);
-            const inv = u.inventory||{};
-            return `<div class="card" style="cursor:pointer;" onclick="showFullWall('${u.username}')">
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;overflow:hidden;">
-                        ${u.profilePic?`<img src="${u.profilePic}" style="width:100%;height:100%;object-fit:cover;">`:u.avatarEmoji||'👤'}
-                    </div>
-                    <div style="flex:1;"><strong>@${u.username}</strong><div style="font-size:0.7rem;color:var(--text-dim);">⭐${u.points} · 🔥${u.streak}j</div></div>
-                    <span style="font-size:1.2rem;color:var(--text-light);">→</span>
-                </div>
-                ${wallPreview.length ? `<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;">${wallPreview.map(sk=>{const item=inv[sk];return item?`<span style="font-size:1.2rem;">${item.i||item.icon}</span>`:'';}).join('')}<span style="font-size:0.65rem;color:var(--text-dim);">+${(u.stickerWall||[]).length-6>0?(u.stickerWall||[]).length-6+' more':''}</span></div>` : '<div style="font-size:0.7rem;color:var(--text-light);margin-top:4px;">Sticker Wall vide</div>'}
-            </div>`;
-        }
-
-        function renderOthers() {
-            const search = document.getElementById('search-input')?.value?.toLowerCase()||'';
-            const mutuals = allUsers.filter(u => u.username!==currentUser && myState.following.includes(u.username) && u.followers.includes(currentUser));
-            const others = allUsers.filter(u => u.username!==currentUser && !mutuals.includes(u) && u.username.includes(search));
-            document.getElementById('others-section').innerHTML = others.length ? others.map(u => renderUserCard(u)).join('') : '<p style="color:var(--text-dim);font-size:0.8rem;">Aucun utilisateur trouvé.</p>';
-        }
-
-        // ============ FULL WALL MODAL ============
-        function showFullWall(username) {
-            const u = allUsers.find(p => p.username === username);
-            if (!u) return;
-            document.getElementById('modal-username').textContent = '@'+u.username;
-            document.getElementById('modal-points').textContent = u.points;
-            document.getElementById('modal-streak').textContent = u.streak;
-            document.getElementById('modal-avatar-display').textContent = u.profilePic ? '' : (u.avatarEmoji||'👤');
-            if (u.profilePic) {
-                document.getElementById('modal-avatar-display').innerHTML = `<img src="${u.profilePic}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">`;
-            }
-
-            const wall = u.stickerWall||[];
-            const inv = u.inventory||{};
-            document.getElementById('modal-full-wall').innerHTML = wall.length ? wall.map(sk => {
-                const item = inv[sk];
-                return item ? `<div style="text-align:center;font-size:2rem;padding:6px;">${item.i||item.icon}<div style="font-size:0.6rem;color:var(--text-dim);">${item.n||item.name}</div></div>` : '';
-            }).join('') : '<span style="color:var(--text-light);">Sticker Wall vide</span>';
-
-            document.getElementById('profile-modal').classList.add('active');
-        }
-
-        function closeProfileModal() { document.getElementById('profile-modal').classList.remove('active'); }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadMyState();
-            loadAllUsers();
-            document.getElementById('nav-points').textContent = myState.points;
-            document.getElementById('wall-count').textContent = '('+myState.stickerWall.length+' stickers)';
-            renderAllSections();
-        });
-
-        document.getElementById('profile-modal').addEventListener('click', e => { if (e.target.id === 'profile-modal') closeProfileModal(); });
-    </script>
+document.addEventListener('DOMContentLoaded',()=>{loadMyState();loadAllUsers();document.getElementById('nav-points').textContent=myState.points;document.getElementById('wall-count').textContent='('+myState.stickerWall.length+')';renderAll();});
+document.getElementById('profile-modal').addEventListener('click',e=>{if(e.target.id==='profile-modal')closeProfileModal();});
+</script>
 </body>
 </html>
