@@ -48,8 +48,8 @@ if(!currentUser)location.href='login.html';
 let myState={points:0,friends:[],following:[],avatarEmoji:'👤'};
 let friendRequests=JSON.parse(localStorage.getItem('receiptit_friend_requests')||'[]');
 
-function loadMyState(){let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{myState={...myState,...JSON.parse(s)};if(!myState.friends)myState.friends=[];}catch(e){}}
-function saveMyState(){let s=JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}');s.friends=myState.friends;localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(s));}
+function loadMyState(){let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{myState={...myState,...JSON.parse(s)};if(!myState.friends)myState.friends=[];if(!myState.following)myState.following=[];}catch(e){}}
+function saveMyState(){let s=JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}');s.friends=myState.friends;s.following=myState.following;localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(s));}
 function saveRequests(){localStorage.setItem('receiptit_friend_requests',JSON.stringify(friendRequests));}
 function getOther(u){let s=localStorage.getItem('receiptit_state_'+u);if(s)try{return JSON.parse(s);}catch(e){}return{};}
 
