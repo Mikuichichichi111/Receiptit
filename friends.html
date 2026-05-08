@@ -22,13 +22,10 @@
 <div class="main-content">
     <div class="section-title">⭐ Mes amis (<span id="friends-count">0</span>)</div>
     <div id="friends-list"></div>
-
     <div class="section-title">📩 Demandes reçues (<span id="received-count">0</span>)</div>
     <div id="received-list"></div>
-
     <div class="section-title">📤 Demandes envoyées (<span id="sent-count">0</span>)</div>
     <div id="sent-list"></div>
-
     <div class="card" style="margin-top:16px;"><h3>🤝 Session entre amis</h3><p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:12px;">Lance une session de groupe !</p><div id="friends-checkboxes"></div><button class="btn-primary" onclick="startGroupSession()" style="margin-top:8px;">🚀 Session de groupe</button></div>
 </div>
 
@@ -41,48 +38,58 @@
 </nav>
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script>
+const SUPABASE_URL='https://fonraobtmkaallsjxtoj.supabase.co';
+const SUPABASE_KEY='sb_publishable_QxU-Ql1Mux18PlLjGady5g_gwkTCKSH';
+let supabase=null;
+(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);console.log('✅ Supabase OK');}catch(e){console.error('❌ Supabase error:',e);}})();
+
 const currentUser=localStorage.getItem('receiptit_logged_user');
 if(!currentUser)location.href='login.html';
 
 let myState={points:0,friends:[],following:[],avatarEmoji:'👤'};
 let friendRequests=JSON.parse(localStorage.getItem('receiptit_friend_requests')||'[]');
+let allUsers=[];
 
-function loadMyState(){let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{myState={...myState,...JSON.parse(s)};if(!myState.friends)myState.friends=[];if(!myState.following)myState.following=[];}catch(e){}}
-function saveMyState(){let s=JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}');s.friends=myState.friends;s.following=myState.following;localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(s));}
+async function loadMyState(){try{let{data}=await supabase.from('receiptit_users').select('points,friends,following,avatar_emoji').eq('username',currentUser).single();if(data){myState.points=data.points||0;myState.friends=data.friends||[];myState.following=data.following||[];myState.avatarEmoji=data.avatar_emoji||'👤';return;}}catch(e){}let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{myState={...myState,...JSON.parse(s)};}catch(e){}}
+async function loadAllUsers(){try{let{data}=await supabase.from('receiptit_users').select('username,points,avatar_emoji,friends');if(data){allUsers=data;renderAll();return;}}catch(e){renderAll();}}
+
+async function saveMyState(){let s=JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}');s.friends=myState.friends;s.following=myState.following;localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(s));try{await supabase.from('receiptit_users').update({friends:myState.friends,following:myState.following}).eq('username',currentUser);}catch(e){}}
+
 function saveRequests(){localStorage.setItem('receiptit_friend_requests',JSON.stringify(friendRequests));}
-function getOther(u){let s=localStorage.getItem('receiptit_state_'+u);if(s)try{return JSON.parse(s);}catch(e){}return{};}
+function getOther(u){let user=allUsers.find(p=>p.username===u);return user||{};}
 
 function renderAll(){
     let friends=myState.friends||[];
     document.getElementById('friends-count').textContent=friends.length;
-    document.getElementById('friends-list').innerHTML=friends.length?friends.map(f=>{let o=getOther(f);return'<div class="user-row"><div class="user-avatar">'+(o.avatarEmoji||'👤')+'</div><div class="user-info"><div class="user-name">@'+f+'</div><div class="user-meta">⭐'+(o.points||0)+'</div></div><button class="btn-small outline" onclick="removeFriend(\''+f+'\')" style="border-color:var(--danger);color:var(--danger);">🗑️</button></div>';}).join(''):'<p style="color:var(--text-dim);">Aucun ami.</p>';
+    document.getElementById('friends-list').innerHTML=friends.length?friends.map(f=>{let o=getOther(f);return'<div class="user-row"><div class="user-avatar">'+(o.avatar_emoji||o.avatarEmoji||'👤')+'</div><div class="user-info"><div class="user-name">@'+f+'</div><div class="user-meta">⭐'+(o.points||0)+'</div></div><button class="btn-small outline" onclick="removeFriend(\''+f+'\')" style="border-color:var(--danger);color:var(--danger);">🗑️</button></div>';}).join(''):'<p style="color:var(--text-dim);">Aucun ami.</p>';
 
     let received=friendRequests.filter(r=>r.to===currentUser&&r.status==='pending');
     document.getElementById('received-count').textContent=received.length;
-    document.getElementById('received-list').innerHTML=received.length?received.map(r=>{let o=getOther(r.from);return'<div class="user-row"><div class="user-avatar">'+(o.avatarEmoji||'👤')+'</div><div class="user-info"><div class="user-name">@'+r.from+'</div><div class="user-meta">Veut être ami</div></div><button class="btn-small" onclick="accept(\''+r.from+'\')">✅</button><button class="btn-small outline" onclick="reject(\''+r.from+'\')" style="border-color:var(--danger);color:var(--danger);margin-left:4px;">❌</button></div>';}).join(''):'<p style="color:var(--text-dim);">Aucune.</p>';
+    document.getElementById('received-list').innerHTML=received.length?received.map(r=>{let o=getOther(r.from);return'<div class="user-row"><div class="user-avatar">'+(o.avatar_emoji||o.avatarEmoji||'👤')+'</div><div class="user-info"><div class="user-name">@'+r.from+'</div><div class="user-meta">Veut être ami</div></div><button class="btn-small" onclick="accept(\''+r.from+'\')">✅</button><button class="btn-small outline" onclick="reject(\''+r.from+'\')" style="border-color:var(--danger);color:var(--danger);margin-left:4px;">❌</button></div>';}).join(''):'<p style="color:var(--text-dim);">Aucune.</p>';
 
     let sent=friendRequests.filter(r=>r.from===currentUser&&r.status==='pending');
     document.getElementById('sent-count').textContent=sent.length;
-    document.getElementById('sent-list').innerHTML=sent.length?sent.map(r=>{let o=getOther(r.to);return'<div class="user-row"><div class="user-avatar">'+(o.avatarEmoji||'👤')+'</div><div class="user-info"><div class="user-name">@'+r.to+'</div><div class="user-meta">En attente...</div></div><button class="btn-small outline" onclick="cancel(\''+r.to+'\')">Annuler</button></div>';}).join(''):'<p style="color:var(--text-dim);">Aucune.</p>';
+    document.getElementById('sent-list').innerHTML=sent.length?sent.map(r=>{let o=getOther(r.to);return'<div class="user-row"><div class="user-avatar">'+(o.avatar_emoji||o.avatarEmoji||'👤')+'</div><div class="user-info"><div class="user-name">@'+r.to+'</div><div class="user-meta">En attente...</div></div><button class="btn-small outline" onclick="cancel(\''+r.to+'\')">Annuler</button></div>';}).join(''):'<p style="color:var(--text-dim);">Aucune.</p>';
 
     document.getElementById('friends-checkboxes').innerHTML=friends.length?friends.map(f=>'<label style="display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;"><input type="checkbox" value="'+f+'" class="fcb" style="accent-color:var(--accent);width:18px;height:18px;"><span>@'+f+'</span></label>').join(''):'<p style="color:var(--text-dim);">Pas d\'amis.</p>';
 }
 
-function accept(from){
+async function accept(from){
     if(!myState.friends)myState.friends=[];if(!myState.friends.includes(from))myState.friends.push(from);
-    let o=JSON.parse(localStorage.getItem('receiptit_state_'+from)||'{}');if(!o.friends)o.friends=[];if(!o.friends.includes(currentUser))o.friends.push(currentUser);
-    localStorage.setItem('receiptit_state_'+from,JSON.stringify(o));
+    let o=getOther(from);if(!o.friends)o.friends=[];if(!o.friends.includes(currentUser))o.friends.push(currentUser);
+    try{await supabase.from('receiptit_users').update({friends:o.friends}).eq('username',from);}catch(e){}
     friendRequests=friendRequests.filter(r=>!(r.from===from&&r.to===currentUser));
-    saveMyState();saveRequests();renderAll();showToast('✅ Ami ajouté !');
+    await saveMyState();saveRequests();renderAll();showToast('✅ Ami ajouté !');
 }
 function reject(from){friendRequests=friendRequests.filter(r=>!(r.from===from&&r.to===currentUser));saveRequests();renderAll();showToast('❌ Refusé');}
 function cancel(to){friendRequests=friendRequests.filter(r=>!(r.from===currentUser&&r.to===to));saveRequests();renderAll();showToast('Annulé');}
-function removeFriend(f){if(!confirm('Supprimer @'+f+' ?'))return;myState.friends=myState.friends.filter(x=>x!==f);let o=JSON.parse(localStorage.getItem('receiptit_state_'+f)||'{}');if(o.friends)o.friends=o.friends.filter(x=>x!==currentUser);localStorage.setItem('receiptit_state_'+f,JSON.stringify(o));saveMyState();renderAll();showToast('💔 Supprimé');}
+async function removeFriend(f){if(!confirm('Supprimer @'+f+' ?'))return;myState.friends=myState.friends.filter(x=>x!==f);let o=getOther(f);if(o.friends)o.friends=o.friends.filter(x=>x!==currentUser);try{await supabase.from('receiptit_users').update({friends:o.friends}).eq('username',f);}catch(e){}await saveMyState();renderAll();showToast('💔 Supprimé');}
 function startGroupSession(){let c=[...document.querySelectorAll('.fcb:checked')].map(cb=>cb.value);if(!c.length){showToast('⚠️ Choisis au moins un ami !');return;}localStorage.setItem('receiptit_group_session',JSON.stringify(c));localStorage.setItem('receiptit_collab_bonus',(1+c.length*0.1).toFixed(1));location.href='session.html';}
 function showToast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-document.addEventListener('DOMContentLoaded',()=>{loadMyState();document.getElementById('nav-points').textContent=myState.points;renderAll();});
+document.addEventListener('DOMContentLoaded',async()=>{await loadMyState();await loadAllUsers();document.getElementById('nav-points').textContent=myState.points;renderAll();});
 </script>
 </body>
 </html>
