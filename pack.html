@@ -8,135 +8,72 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="bg-blob blob-1"></div>
-    <div class="bg-blob blob-2"></div>
-    <div class="bg-blob blob-3"></div>
-    <canvas id="particles-canvas"></canvas>
-    <div class="majestic-overlay" id="majestic-overlay"></div>
+<div class="bg-blob blob-1"></div><div class="bg-blob blob-2"></div><div class="bg-blob blob-3"></div>
+<canvas id="particles-canvas"></canvas>
+<div class="majestic-overlay" id="majestic-overlay"></div>
 
-    <nav class="navbar">
-        <div class="navbar-brand" onclick="location.href='index.html'" style="cursor:pointer;">RECEIPTIT</div>
-        <div class="navbar-actions">
-            <a href="inventory.html" class="navbar-link">🎒</a>
-            <a href="sticker-world.html" class="navbar-link">🌍</a>
-            <a href="friends.html" class="navbar-link">👥</a>
-            <a href="trades.html" class="navbar-link">🔄</a>
-            <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
-        </div>
-    </nav>
-
-    <div class="main-content-wide">
-        <div class="section-title">🎁 Choisis ton pack</div>
-        <div id="packs-container"></div>
-        <div class="history-section"><div class="history-title">📜 Historique</div><div class="history-list" id="history-list"></div></div>
+<nav class="navbar">
+    <div class="navbar-brand" onclick="location.href='index.html'">RECEIPTIT</div>
+    <div class="navbar-actions">
+        <a href="inventory.html" class="navbar-link">🎒</a><a href="sticker-world.html" class="navbar-link">🌍</a>
+        <a href="friends.html" class="navbar-link">👥</a><a href="trades.html" class="navbar-link">🔄</a>
+        <div class="navbar-points"><span>⭐</span><span id="nav-points">0</span></div>
     </div>
+</nav>
 
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
-        <a href="pomodoro.html" class="nav-item"><span class="nav-icon">⏱️</span><span class="nav-label">Focus</span></a>
-        <a href="session.html" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Session</span></a>
-        <a href="pack.html" class="nav-item active"><span class="nav-icon">🎁</span><span class="nav-label">Pack</span></a>
-        <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
-    </nav>
+<div class="main-content-wide">
+    <div class="section-title">🎁 Choisis ton pack</div>
+    <div id="packs-container"></div>
+    <div class="history-section"><div class="history-title">📜 Historique</div><div class="history-list" id="history-list"></div></div>
+</div>
 
-    <div class="modal-overlay" id="opening-modal">
-        <div class="modal-content" style="text-align:center;"><span class="modal-icon" id="opening-icon">🎁</span><p id="opening-name">Ouverture...</p><p id="opening-rarity" style="color:var(--text-dim);"></p><div id="opening-anim" style="font-size:4rem;padding:20px;animation:float 1s infinite;">🎁</div><button class="modal-btn" id="opening-btn" onclick="revealItem()" style="display:none;">✨ Révéler !</button></div>
-    </div>
-    <div class="modal-overlay" id="result-modal">
-        <div class="modal-content"><span class="modal-icon" id="result-icon">🎁</span><div class="modal-name" id="result-name">Item</div><div class="modal-rarity" id="result-rarity">Rarity</div><button class="modal-btn" onclick="closeResult()">🎉 Super !</button></div>
-    </div>
-    <div class="toast" id="toast"></div>
+<nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></a>
+    <a href="pomodoro.html" class="nav-item"><span class="nav-icon">⏱️</span><span class="nav-label">Focus</span></a>
+    <a href="session.html" class="nav-item"><span class="nav-icon">➕</span><span class="nav-label">Session</span></a>
+    <a href="pack.html" class="nav-item active"><span class="nav-icon">🎁</span><span class="nav-label">Pack</span></a>
+    <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></a>
+</nav>
 
-    <script src="config.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
-    <script>
-        const SUPABASE_URL = CONFIG.SUPABASE_URL, SUPABASE_KEY = CONFIG.SUPABASE_KEY;
-        let supabase = null, supabaseReady = false;
-        (async function(){ try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); supabaseReady = true; } catch(e) {} })();
+<div class="modal-overlay" id="opening-modal"><div class="modal-content" style="text-align:center;"><span class="modal-icon" id="opening-icon">🎁</span><p id="opening-name">Ouverture...</p><div id="opening-anim" style="font-size:4rem;padding:20px;animation:float 1s infinite;">🎁</div><button class="modal-btn" id="opening-btn" onclick="revealItem()" style="display:none;">✨ Révéler !</button></div></div>
+<div class="modal-overlay" id="result-modal"><div class="modal-content"><span class="modal-icon" id="result-icon">🎁</span><div class="modal-name" id="result-name">Item</div><div class="modal-rarity" id="result-rarity">Rarity</div><button class="modal-btn" onclick="closeResult()">🎉 Super !</button></div></div>
+<div class="toast" id="toast"></div>
 
-        const currentUser = localStorage.getItem('receiptit_logged_user');
-        if (!currentUser) location.href = 'login.html';
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL='https://fonraobtmkaallsjxtoj.supabase.co';
+const SUPABASE_KEY='sb_publishable_QxU-Ql1Mux18PlLjGady5g_gwkTCKSH';
+let supabase=null,supabaseOnline=false;
+(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);supabaseOnline=true;}catch(e){}})();
 
-        let state = { points:0,inventory:{},packsOpened:0,packHistory:[],userId:'user_'+Math.random().toString(36).substr(2,9)+'_'+Date.now() };
-        let pendingItem = null;
-        const RC = {common:'#94a3b8',rare:'#60a5fa',epic:'#a78bfa',legendary:'#fbbf24',divine:'#f472b6'};
-        const RN = {common:'Commun',rare:'Rare',epic:'Épique',legendary:'Légendaire',divine:'Divin'};
-        const RE = {common:'⭐',rare:'🔵',epic:'🟣',legendary:'🟠',divine:'🔴'};
-        const ITEMS = {
-            common:[{n:'Stylo',i:'🖊️'},{n:'Gomme',i:'🧼'},{n:'Règle',i:'📏'},{n:'Crayon',i:'✏️'},{n:'Post-it',i:'📝'}],
-            rare:[{n:'Café',i:'☕'},{n:'Lampe',i:'💡'},{n:'Casque',i:'🎧'},{n:'Clé USB',i:'🔑'}],
-            epic:[{n:'Tablette',i:'📱'},{n:'Enceinte',i:'🔊'},{n:'Montre',i:'⌚'},{n:'Appareil',i:'📷'}],
-            legendary:[{n:'MacBook',i:'💻'},{n:'iPad',i:'📲'},{n:'PS5',i:'🎮'},{n:'Drone',i:'🚁'}],
-            divine:[{n:'Tesla',i:'🚗'},{n:'Yacht',i:'🛥️'},{n:'Jet',i:'✈️'},{n:'Licorne',i:'🦄'}]
-        };
-        const PACKS = [
-            {id:'normal',name:'Pack Normal',icon:'📦',cost:100,probs:{common:70,rare:20,epic:9,legendary:0.9,divine:0.1},guaranteed:null},
-            {id:'premium',name:'Pack Premium',icon:'⭐',cost:250,probs:{common:50,rare:30,epic:15,legendary:4,divine:1},guaranteed:null},
-            {id:'epic',name:'Pack Épique',icon:'🔮',cost:500,probs:{common:20,rare:35,epic:30,legendary:12,divine:3},guaranteed:'rare'},
-            {id:'legendary',name:'Pack Légendaire',icon:'👑',cost:1000,probs:{common:0,rare:20,epic:40,legendary:30,divine:10},guaranteed:'epic'},
-            {id:'divine',name:'Pack Divin',icon:'🌟',cost:2500,probs:{common:0,rare:0,epic:30,legendary:45,divine:25},guaranteed:'legendary'},
-            {id:'ultimate',name:'Pack Ultime',icon:'💫',cost:5000,probs:{common:0,rare:0,epic:0,legendary:50,divine:50},guaranteed:'legendary'}
-        ];
+const currentUser=localStorage.getItem('receiptit_logged_user');
+if(!currentUser)location.href='login.html';
 
-        function cacheState() { localStorage.setItem('receiptit_state_'+currentUser, JSON.stringify(state)); }
-        async function saveToDB() { cacheState(); if (!supabaseReady) return; try { await supabase.from('receiptit_users').upsert({ user_id:state.userId,username:currentUser,points:state.points,inventory:state.inventory,packs_opened:state.packsOpened,pack_history:state.packHistory,updated_at:new Date().toISOString() },{onConflict:'username'}); } catch(e) {} }
-        async function loadFromDB() { if (!supabaseReady) return false; try { const {data} = await supabase.from('receiptit_users').select('*').eq('username',currentUser).single(); if (data) { state.points=data.points||0; state.inventory=data.inventory||{}; state.packsOpened=data.packs_opened||0; state.packHistory=data.pack_history||[]; state.userId=data.user_id||state.userId; cacheState(); return true; } } catch(e) {} const c=localStorage.getItem('receiptit_state_'+currentUser); if(c) try{state={...state,...JSON.parse(c)};}catch(e){} return false; }
+let state={points:0,inventory:{},packsOpened:0,packHistory:[],userId:localStorage.getItem('receiptit_user_id')||'user_'+Math.random().toString(36).substr(2,9)+'_'+Date.now()};
+let pendingItem=null;
+const RC={common:'#94a3b8',rare:'#60a5fa',epic:'#a78bfa',legendary:'#fbbf24',divine:'#f472b6'};
+const RN={common:'Commun',rare:'Rare',epic:'Épique',legendary:'Légendaire',divine:'Divin'};
+const ITEMS={common:[{n:'Stylo',i:'🖊️'},{n:'Gomme',i:'🧼'},{n:'Règle',i:'📏'},{n:'Crayon',i:'✏️'},{n:'Post-it',i:'📝'}],rare:[{n:'Café',i:'☕'},{n:'Lampe',i:'💡'},{n:'Casque',i:'🎧'},{n:'Clé USB',i:'🔑'}],epic:[{n:'Tablette',i:'📱'},{n:'Enceinte',i:'🔊'},{n:'Montre',i:'⌚'},{n:'Appareil',i:'📷'}],legendary:[{n:'MacBook',i:'💻'},{n:'iPad',i:'📲'},{n:'PS5',i:'🎮'},{n:'Drone',i:'🚁'}],divine:[{n:'Tesla',i:'🚗'},{n:'Yacht',i:'🛥️'},{n:'Jet',i:'✈️'},{n:'Licorne',i:'🦄'}]};
+const PACKS=[{id:'normal',name:'Pack Normal',icon:'📦',cost:100,probs:{common:70,rare:20,epic:9,legendary:0.9,divine:0.1},guaranteed:null},{id:'premium',name:'Pack Premium',icon:'⭐',cost:250,probs:{common:50,rare:30,epic:15,legendary:4,divine:1},guaranteed:null},{id:'epic',name:'Pack Épique',icon:'🔮',cost:500,probs:{common:20,rare:35,epic:30,legendary:12,divine:3},guaranteed:'rare'},{id:'legendary',name:'Pack Légendaire',icon:'👑',cost:1000,probs:{common:0,rare:20,epic:40,legendary:30,divine:10},guaranteed:'epic'},{id:'divine',name:'Pack Divin',icon:'🌟',cost:2500,probs:{common:0,rare:0,epic:30,legendary:45,divine:25},guaranteed:'legendary'},{id:'ultimate',name:'Pack Ultime',icon:'💫',cost:5000,probs:{common:0,rare:0,epic:0,legendary:50,divine:50},guaranteed:'legendary'}];
 
-        function renderPacks() {
-            document.getElementById('packs-container').innerHTML = PACKS.map(p => {
-                const can = state.points >= p.cost;
-                return `<div class="card" style="position:relative;">
-                    ${p.guaranteed?`<div style="position:absolute;top:10px;right:10px;background:${RC[p.guaranteed]};color:white;padding:4px 10px;border-radius:8px;font-size:0.7rem;font-weight:700;">GARANTI ${RN[p.guaranteed]}</div>`:''}
-                    <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;"><div style="font-size:3rem;">${p.icon}</div><div><div style="font-weight:700;">${p.name}</div><div style="font-family:'Space Mono',monospace;color:#fbbf24;">⭐ ${p.cost} pts</div></div></div>
-                    <div class="prob-bar">${Object.entries(p.probs).map(([r,pr])=>pr>0?`<div class="prob-segment" style="width:${pr}%;background:${RC[r]};">${pr>=10?Math.round(pr)+'%':''}</div>`:'').join('')}</div>
-                    <div style="display:flex;gap:6px;font-size:0.65rem;flex-wrap:wrap;margin:8px 0;">${Object.entries(p.probs).map(([r,pr])=>pr>0?`<span style="color:${RC[r]};font-weight:600;">${RE[r]} ${Math.round(pr)}%</span>`:'').join('')}</div>
-                    <details><summary style="font-size:0.8rem;font-weight:600;color:var(--text-dim);cursor:pointer;">👁️ Voir les items</summary><div style="margin-top:8px;">${['divine','legendary','epic','rare','common'].map(r=>{if(p.probs[r]<=0)return'';const items=ITEMS[r]||[];return`<div style="margin-bottom:4px;"><span style="color:${RC[r]};font-weight:700;font-size:0.7rem;">${RE[r]} ${RN[r]}</span><div style="display:flex;flex-wrap:wrap;gap:3px;">${items.map(i=>`<span style="background:${RC[r]}15;padding:2px 6px;border-radius:6px;font-size:0.7rem;">${i.i} ${i.n}</span>`).join('')}</div></div>`;}).join('')}</div></details>
-                    <button class="btn-primary" style="margin-top:10px;background:${can?`linear-gradient(135deg,${RC.epic},var(--accent))`:'#ccc'};" ${!can?'disabled':''} onclick="openPack('${p.id}')">${can?'✨ Ouvrir':'⭐ '+state.points+'/'+p.cost}</button>
-                </div>`;
-            }).join('');
-        }
+function localSave(){localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(state));}
+function localLoad(){let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{state={...state,...JSON.parse(s)};}catch(e){}}
+async function saveToDB(){localSave();if(!supabaseOnline)return;try{await supabase.from('receiptit_users').upsert({user_id:state.userId,username:currentUser,points:state.points,inventory:state.inventory,packs_opened:state.packsOpened,pack_history:state.packHistory,updated_at:new Date().toISOString()},{onConflict:'username'});}catch(e){}}
+async function loadFromDB(){if(!supabaseOnline){localLoad();return false;}try{let{data}=await supabase.from('receiptit_users').select('*').eq('username',currentUser).single();if(data){state.points=data.points||0;state.inventory=data.inventory||{};state.packsOpened=data.packs_opened||0;state.packHistory=data.pack_history||[];state.userId=data.user_id||state.userId;localSave();return true;}}catch(e){}localLoad();return false;}
 
-        function getRarity(probs) { const r=Math.random()*100; let c=0; for(const [k,v] of Object.entries(probs)){c+=v;if(r<c)return k;} return'common'; }
-        function openPack(id) {
-            const pack=PACKS.find(p=>p.id===id); if(!pack||state.points<pack.cost){showToast('⚠️ Pas assez de points !');return;}
-            state.points-=pack.cost;state.packsOpened++;
-            let rarity=getRarity(pack.probs);
-            if(pack.guaranteed){const o=['common','rare','epic','legendary','divine'];if(o.indexOf(rarity)<o.indexOf(pack.guaranteed))rarity=pack.guaranteed;}
-            const item=ITEMS[rarity]?.[Math.floor(Math.random()*ITEMS[rarity].length)]||ITEMS.common[0];
-            pendingItem={...item,rarity,packName:pack.name};
-            document.getElementById('opening-icon').textContent=pack.icon;document.getElementById('opening-name').textContent=pack.name;
-            document.getElementById('opening-anim').style.display='block';document.getElementById('opening-btn').style.display='none';
-            document.getElementById('opening-modal').classList.add('active');
-            setTimeout(()=>{document.getElementById('opening-anim').style.display='none';document.getElementById('opening-btn').style.display='block';},1500);
-            document.getElementById('nav-points').textContent=state.points;
-        }
+function renderPacks(){document.getElementById('packs-container').innerHTML=PACKS.map(p=>{let can=state.points>=p.cost;return'<div class="card" style="position:relative;">'+(p.guaranteed?'<div style="position:absolute;top:10px;right:10px;background:'+RC[p.guaranteed]+';color:white;padding:4px 10px;border-radius:8px;font-size:0.7rem;font-weight:700;">GARANTI '+RN[p.guaranteed]+'</div>':'')+'<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;"><div style="font-size:3rem;">'+p.icon+'</div><div><div style="font-weight:700;">'+p.name+'</div><div style="font-family:Space Mono,monospace;color:#fbbf24;">⭐ '+p.cost+' pts</div></div></div><div class="prob-bar">'+Object.entries(p.probs).map(([r,pr])=>pr>0?'<div class="prob-segment" style="width:'+pr+'%;background:'+RC[r]+';">'+(pr>=10?Math.round(pr)+'%':'')+'</div>':'').join('')+'</div><div style="display:flex;gap:6px;font-size:0.65rem;flex-wrap:wrap;margin:8px 0;">'+Object.entries(p.probs).map(([r,pr])=>pr>0?'<span style="color:'+RC[r]+';font-weight:600;">'+({common:'⭐',rare:'🔵',epic:'🟣',legendary:'🟠',divine:'🔴'}[r])+' '+Math.round(pr)+'%</span>':'').join('')+'</div><button class="btn-primary" style="margin-top:10px;background:'+(can?'linear-gradient(135deg,'+RC.epic+',var(--accent))':'#ccc')+';" '+(can?'':'disabled')+' onclick="openPack(\''+p.id+'\')">'+(can?'✨ Ouvrir':'⭐ '+state.points+'/'+p.cost)+'</button></div>';}).join('');}
 
-        function revealItem() {
-            if(!pendingItem)return;const item=pendingItem;
-            const key=item.rarity+'_'+item.n;if(!state.inventory[key])state.inventory[key]={n:item.n,i:item.i,rarity:item.rarity,count:0};
-            state.inventory[key].count++;state.packHistory.unshift({n:item.n,i:item.i,rarity:item.rarity,pn:item.packName,t:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
-            if(state.packHistory.length>50)state.packHistory.pop();
-            saveToDB();document.getElementById('opening-modal').classList.remove('active');
-            document.getElementById('result-icon').textContent=item.i;document.getElementById('result-name').textContent=item.n;
-            document.getElementById('result-name').style.color=RC[item.rarity];document.getElementById('result-rarity').textContent=RN[item.rarity];
-            document.getElementById('result-rarity').style.color=RC[item.rarity];document.getElementById('result-modal').classList.add('active');
-            if(item.rarity==='legendary'||item.rarity==='divine'){document.getElementById('majestic-overlay').classList.add('active');document.body.classList.add('shake');setTimeout(()=>{document.getElementById('majestic-overlay').classList.remove('active');document.body.classList.remove('shake');},2000);launchParticles();}
-            updateHistory();renderPacks();pendingItem=null;
-        }
+function getRarity(probs){let r=Math.random()*100,c=0;for(let[k,v]of Object.entries(probs)){c+=v;if(r<c)return k;}return'common';}
+function openPack(id){let pack=PACKS.find(p=>p.id===id);if(!pack||state.points<pack.cost){showToast('⚠️ Pas assez de points !');return;}state.points-=pack.cost;state.packsOpened++;let rarity=getRarity(pack.probs);if(pack.guaranteed){let o=['common','rare','epic','legendary','divine'];if(o.indexOf(rarity)<o.indexOf(pack.guaranteed))rarity=pack.guaranteed;}let item=ITEMS[rarity]?.[Math.floor(Math.random()*ITEMS[rarity].length)]||ITEMS.common[0];pendingItem={...item,rarity,packName:pack.name};document.getElementById('opening-icon').textContent=pack.icon;document.getElementById('opening-name').textContent=pack.name;document.getElementById('opening-anim').style.display='block';document.getElementById('opening-btn').style.display='none';document.getElementById('opening-modal').classList.add('active');setTimeout(()=>{document.getElementById('opening-anim').style.display='none';document.getElementById('opening-btn').style.display='block';},1500);document.getElementById('nav-points').textContent=state.points;}
+function revealItem(){if(!pendingItem)return;let item=pendingItem;let key=item.rarity+'_'+item.n;if(!state.inventory[key])state.inventory[key]={n:item.n,i:item.i,rarity:item.rarity,count:0};state.inventory[key].count++;state.packHistory.unshift({n:item.n,i:item.i,rarity:item.rarity,pn:item.packName,t:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});if(state.packHistory.length>50)state.packHistory.pop();saveToDB();document.getElementById('opening-modal').classList.remove('active');document.getElementById('result-icon').textContent=item.i;document.getElementById('result-name').textContent=item.n;document.getElementById('result-name').style.color=RC[item.rarity];document.getElementById('result-rarity').textContent=RN[item.rarity];document.getElementById('result-rarity').style.color=RC[item.rarity];document.getElementById('result-modal').classList.add('active');if(item.rarity==='legendary'||item.rarity==='divine'){document.getElementById('majestic-overlay').classList.add('active');document.body.classList.add('shake');setTimeout(()=>{document.getElementById('majestic-overlay').classList.remove('active');document.body.classList.remove('shake');},2000);launchParticles();}updateHistory();renderPacks();pendingItem=null;}
+function closeResult(){document.getElementById('result-modal').classList.remove('active');}
+function launchParticles(){let c=document.getElementById('particles-canvas'),ctx=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;let p=[],cols=['#fbbf24','#f472b6'];for(let i=0;i<80;i++)p.push({x:c.width/2,y:c.height/2,vx:(Math.random()-0.5)*16,vy:(Math.random()-0.5)*16-5,s:Math.random()*7+2,cl:cols[Math.floor(Math.random()*cols.length)],l:1,d:Math.random()*0.012+0.006});(function a(){ctx.clearRect(0,0,c.width,c.height);let al=false;p.forEach(p=>{if(p.l>0){al=true;p.x+=p.vx;p.y+=p.vy;p.vy+=0.14;p.l-=p.d;ctx.globalAlpha=p.l;ctx.fillStyle=p.cl;ctx.fillRect(p.x,p.y,p.s,p.s);}});if(al)requestAnimationFrame(a);})();}
+function updateHistory(){let l=document.getElementById('history-list');if(!state.packHistory.length){l.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:20px;">Aucun pack ouvert. 🎁</div>';return;}l.innerHTML=state.packHistory.slice(0,20).map(h=>'<div class="history-item"><span class="hi-icon">'+h.i+'</span><div class="hi-info"><div class="hi-name">'+h.n+'</div><div class="hi-rarity" style="color:'+RC[h.rarity]+'">'+RN[h.rarity]+' · '+(h.pn||'')+'</div></div><div class="hi-time">'+h.t+'</div></div>').join('');}
+function showToast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-        function closeResult() { document.getElementById('result-modal').classList.remove('active'); }
-        function launchParticles() { const c=document.getElementById('particles-canvas'),ctx=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;const p=[],cols=['#fbbf24','#f472b6'];for(let i=0;i<80;i++)p.push({x:c.width/2,y:c.height/2,vx:(Math.random()-0.5)*16,vy:(Math.random()-0.5)*16-5,s:Math.random()*7+2,cl:cols[Math.floor(Math.random()*cols.length)],l:1,d:Math.random()*0.012+0.006});(function a(){ctx.clearRect(0,0,c.width,c.height);let al=false;p.forEach(p=>{if(p.l>0){al=true;p.x+=p.vx;p.y+=p.vy;p.vy+=0.14;p.l-=p.d;ctx.globalAlpha=p.l;ctx.fillStyle=p.cl;ctx.fillRect(p.x,p.y,p.s,p.s);}});if(al)requestAnimationFrame(a);})(); }
-        function updateHistory() { const l=document.getElementById('history-list');if(!state.packHistory.length){l.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:20px;">Aucun pack ouvert. 🎁</div>';return;}l.innerHTML=state.packHistory.slice(0,20).map(h=>`<div class="history-item"><span class="hi-icon">${h.i}</span><div class="hi-info"><div class="hi-name">${h.n}</div><div class="hi-rarity" style="color:${RC[h.rarity]}">${RN[h.rarity]} · ${h.pn||''}</div></div><div class="hi-time">${h.t}</div></div>`).join(''); }
-        function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500); }
-
-        document.addEventListener('DOMContentLoaded',async()=>{
-            const loaded=await loadFromDB();
-            if(!loaded){const c=localStorage.getItem('receiptit_state_'+currentUser);if(c)try{state={...state,...JSON.parse(c)};}catch(e){}}
-            document.getElementById('nav-points').textContent=state.points;
-            renderPacks();updateHistory();
-        });
-        document.getElementById('opening-modal').addEventListener('click',e=>{if(e.target.id==='opening-modal'){document.getElementById('opening-modal').classList.remove('active');pendingItem=null;}});
-        document.getElementById('result-modal').addEventListener('click',e=>{if(e.target.id==='result-modal')closeResult();});
-    </script>
+document.addEventListener('DOMContentLoaded',async()=>{let loaded=await loadFromDB();if(!loaded)localLoad();document.getElementById('nav-points').textContent=state.points;renderPacks();updateHistory();});
+document.getElementById('opening-modal').addEventListener('click',e=>{if(e.target.id==='opening-modal'){document.getElementById('opening-modal').classList.remove('active');pendingItem=null;}});
+document.getElementById('result-modal').addEventListener('click',e=>{if(e.target.id==='result-modal')closeResult();});
+</script>
 </body>
 </html>
