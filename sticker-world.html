@@ -21,21 +21,13 @@
 </nav>
 
 <div class="main-content">
-    <!-- MON STICKER WALL -->
-    <div class="collapsible-header" onclick="toggleMyWall()">
-        <span>🏷️ <strong>Mon Sticker Wall</strong> <span id="wall-count" style="font-size:0.8rem;color:var(--text-dim);"></span></span>
-        <span id="wall-arrow">▼</span>
-    </div>
+    <div class="collapsible-header" onclick="toggleMyWall()"><span>🏷️ <strong>Mon Sticker Wall</strong> <span id="wall-count"></span></span><span id="wall-arrow">▼</span></div>
     <div class="collapsible-body" id="my-wall-body">
         <p style="font-size:0.75rem;color:var(--text-dim);margin-bottom:8px;">Clique pour ajouter/retirer. Les 6 premiers visibles par tous.</p>
         <div class="sw-grid" id="my-wall-grid"></div>
     </div>
-
-    <!-- AMIS -->
     <div class="section-title">⭐ Mes amis</div>
     <div id="friends-section"></div>
-
-    <!-- AUTRES -->
     <div class="section-title">🔍 Autres</div>
     <input type="text" id="search-input" placeholder="Rechercher..." style="width:100%;padding:10px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);font-family:'Outfit',sans-serif;font-size:0.85rem;margin-bottom:12px;" oninput="renderOthers()">
     <div id="others-section"></div>
@@ -56,8 +48,8 @@
 <script>
 const SUPABASE_URL='https://fonraobtmkaallsjxtoj.supabase.co';
 const SUPABASE_KEY='sb_publishable_QxU-Ql1Mux18PlLjGady5g_gwkTCKSH';
-let supabase=null,supabaseOnline=false;
-(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);supabaseOnline=true}catch(e){supabaseOnline=false}})();
+let supabase=null;
+(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);console.log('✅ Supabase OK');}catch(e){console.error('❌ Supabase error:',e);}})();
 
 const currentUser=localStorage.getItem('receiptit_logged_user');
 if(!currentUser)location.href='login.html';
@@ -67,29 +59,24 @@ let allUsers=[];
 let selectedUser=null;
 let friendRequests=JSON.parse(localStorage.getItem('receiptit_friend_requests')||'[]');
 
-async function loadMyState(){
-    if(supabaseOnline){try{let{data}=await supabase.from('receiptit_users').select('*').eq('username',currentUser).single();if(data){myState.points=data.points||0;myState.inventory=data.inventory||{};myState.stickerWall=data.sticker_wall||[];myState.avatarEmoji=data.avatar_emoji||'👤';myState.profilePic=data.profile_pic||null;myState.friends=data.friends||[];myState.following=data.following||[];localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify({...JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}'),stickerWall:myState.stickerWall,friends:myState.friends,following:myState.following}));return;}}catch(e){}}
-    let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{let d=JSON.parse(s);myState={...myState,...d};if(!myState.stickerWall)myState.stickerWall=[];}catch(e){}
-}
-async function saveMyState(){localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify({...JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}'),stickerWall:myState.stickerWall}));if(supabaseOnline)try{await supabase.from('receiptit_users').update({sticker_wall:myState.stickerWall}).eq('username',currentUser);}catch(e){}}
-
-function loadAllUsers(){let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');allUsers=[];Object.keys(users).forEach(u=>{let s=localStorage.getItem('receiptit_state_'+u);if(s)try{let st=JSON.parse(s);allUsers.push({username:u,points:st.points||0,streak:st.streak||0,stickerWall:st.stickerWall||[],avatarEmoji:st.avatarEmoji||'👤',profilePic:st.profilePic||null,inventory:st.inventory||{},friends:st.friends||[],followers:st.followers||[],following:st.following||[]});}catch(e){}});}
+async function loadMyState(){try{let{data}=await supabase.from('receiptit_users').select('*').eq('username',currentUser).single();if(data){myState.points=data.points||0;myState.inventory=data.inventory||{};myState.stickerWall=data.sticker_wall||[];myState.avatarEmoji=data.avatar_emoji||'👤';myState.profilePic=data.profile_pic||null;myState.friends=data.friends||[];myState.following=data.following||[];return;}}catch(e){}let s=localStorage.getItem('receiptit_state_'+currentUser);if(s)try{let d=JSON.parse(s);myState={...myState,...d};if(!myState.stickerWall)myState.stickerWall=[];}catch(e){}}
+async function saveMyWall(){localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify({...JSON.parse(localStorage.getItem('receiptit_state_'+currentUser)||'{}'),stickerWall:myState.stickerWall}));try{await supabase.from('receiptit_users').update({sticker_wall:myState.stickerWall}).eq('username',currentUser);}catch(e){}}
+async function loadAllUsers(){try{let{data}=await supabase.from('receiptit_users').select('username,points,streak,sticker_wall,avatar_emoji,profile_pic,inventory,friends,followers,following');if(data){allUsers=data;renderAll();return;}}catch(e){}let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');allUsers=[];Object.keys(users).forEach(u=>{let s=localStorage.getItem('receiptit_state_'+u);if(s)try{let st=JSON.parse(s);allUsers.push({username:u,points:st.points||0,streak:st.streak||0,stickerWall:st.stickerWall||[],avatarEmoji:st.avatarEmoji||'👤',profilePic:st.profilePic||null,inventory:st.inventory||{},friends:st.friends||[],followers:st.followers||[],following:st.following||[]});}catch(e){}});renderAll();}
 
 function toggleMyWall(){let b=document.getElementById('my-wall-body'),a=document.getElementById('wall-arrow');b.classList.toggle('open');a.textContent=b.classList.contains('open')?'▲':'▼';if(b.classList.contains('open'))renderMyWallGrid();}
 function renderMyWallGrid(){let g=document.getElementById('my-wall-grid'),items=Object.entries(myState.inventory).map(([k,v])=>({key:k,...v}));document.getElementById('wall-count').textContent='('+myState.stickerWall.length+' stickers)';if(!items.length){g.innerHTML='<div style="grid-column:span 6;text-align:center;color:var(--text-light);">Pas de stickers.</div>';return;}g.innerHTML=items.map(item=>{let inWall=myState.stickerWall.includes(item.key);return'<div class="sw-item '+(inWall?'in-wall':'')+'" onclick="toggleWallSticker(\''+item.key.replace(/'/g,"\\'")+'\')">'+(item.i||item.icon)+(inWall?'<span style="position:absolute;top:2px;right:2px;font-size:0.6rem;">✅</span>':'')+'<div style="font-size:0.55rem;">'+(item.n||item.name)+'</div></div>';}).join('');}
-function toggleWallSticker(key){let idx=myState.stickerWall.indexOf(key);if(idx>-1)myState.stickerWall.splice(idx,1);else myState.stickerWall.push(key);saveMyState();renderMyWallGrid();renderAll();}
+function toggleWallSticker(key){let idx=myState.stickerWall.indexOf(key);if(idx>-1)myState.stickerWall.splice(idx,1);else myState.stickerWall.push(key);saveMyWall();renderMyWallGrid();renderAll();}
 
 function renderAll(){let mutuals=allUsers.filter(u=>u.username!==currentUser&&(myState.friends||[]).includes(u.username));document.getElementById('friends-section').innerHTML=mutuals.length?mutuals.map(u=>renderUserCard(u)).join(''):'<p style="color:var(--text-dim);">Aucun ami.</p>';renderOthers();}
-function renderUserCard(u){let preview=(u.stickerWall||[]).slice(0,6),inv=u.inventory||{};return'<div class="card" style="cursor:pointer;" onclick="showFullWall(\''+u.username+'\')"><div style="display:flex;align-items:center;gap:12px;"><div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;overflow:hidden;">'+(u.profilePic?'<img src="'+u.profilePic+'" style="width:100%;height:100%;object-fit:cover;">':(u.avatarEmoji||'👤'))+'</div><div style="flex:1;"><strong>@'+u.username+'</strong><div style="font-size:0.7rem;color:var(--text-dim);">⭐'+u.points+' · 🔥'+u.streak+'j</div></div><span style="font-size:1.2rem;color:var(--text-light);">→</span></div>'+(preview.length?'<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;">'+preview.map(sk=>{let item=inv[sk];return item?'<span style="font-size:1.2rem;">'+(item.i||item.icon)+'</span>':'';}).join('')+'</div>':'')+'</div>';}
+function renderUserCard(u){let preview=(u.sticker_wall||u.stickerWall||[]).slice(0,6),inv=u.inventory||{};return'<div class="card" style="cursor:pointer;" onclick="showFullWall(\''+u.username+'\')"><div style="display:flex;align-items:center;gap:12px;"><div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:white;overflow:hidden;">'+(u.profilePic||u.profile_pic?'<img src="'+(u.profilePic||u.profile_pic)+'" style="width:100%;height:100%;object-fit:cover;">':(u.avatarEmoji||u.avatar_emoji||'👤'))+'</div><div style="flex:1;"><strong>@'+u.username+'</strong><div style="font-size:0.7rem;color:var(--text-dim);">⭐'+u.points+' · 🔥'+u.streak+'j</div></div><span style="font-size:1.2rem;">→</span></div>'+(preview.length?'<div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;">'+preview.map(sk=>{let item=inv[sk];return item?'<span style="font-size:1.2rem;">'+(item.i||item.icon)+'</span>':'';}).join('')+'</div>':'')+'</div>';}
 function renderOthers(){let s=document.getElementById('search-input')?.value?.toLowerCase()||'';let mutuals=allUsers.filter(u=>u.username!==currentUser&&(myState.friends||[]).includes(u.username));let others=allUsers.filter(u=>u.username!==currentUser&&!mutuals.includes(u)&&u.username.includes(s));document.getElementById('others-section').innerHTML=others.length?others.map(u=>renderUserCard(u)).join(''):'<p style="color:var(--text-dim);">Aucun.</p>';}
 
-function showFullWall(u){selectedUser=u;let user=allUsers.find(p=>p.username===u);if(!user)return;document.getElementById('modal-username').textContent='@'+u;document.getElementById('modal-points').textContent=user.points;document.getElementById('modal-streak').textContent=user.streak;document.getElementById('modal-avatar-display').innerHTML=user.profilePic?'<img src="'+user.profilePic+'" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">':(user.avatarEmoji||'👤');let wall=user.stickerWall||[],inv=user.inventory||{};document.getElementById('modal-full-wall').innerHTML=wall.length?wall.map(sk=>{let item=inv[sk];return item?'<div style="text-align:center;font-size:2rem;padding:6px;">'+(item.i||item.icon)+'<div style="font-size:0.6rem;">'+(item.n||item.name)+'</div></div>':'';}).join(''):'<span style="color:var(--text-light);">Wall vide</span>';let btn=document.getElementById('modal-friend-btn');if(u===currentUser){btn.style.display='none';}else{btn.style.display='block';let isFriend=(myState.friends||[]).includes(u);let isPending=friendRequests.find(r=>r.from===currentUser&&r.to===u&&r.status==='pending');btn.textContent=isFriend?'✅ Ami':(isPending?'⏳ En attente':'👥 Demande d\'ami');btn.style.background=isFriend?'var(--success)':'';}document.getElementById('profile-modal').classList.add('active');}
-
+function showFullWall(u){selectedUser=u;let user=allUsers.find(p=>p.username===u);if(!user)return;document.getElementById('modal-username').textContent='@'+u;document.getElementById('modal-points').textContent=user.points;document.getElementById('modal-streak').textContent=user.streak;document.getElementById('modal-avatar-display').innerHTML=(user.profilePic||user.profile_pic)?'<img src="'+(user.profilePic||user.profile_pic)+'" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">':(user.avatarEmoji||user.avatar_emoji||'👤');let wall=user.sticker_wall||user.stickerWall||[],inv=user.inventory||{};document.getElementById('modal-full-wall').innerHTML=wall.length?wall.map(sk=>{let item=inv[sk];return item?'<div style="text-align:center;font-size:2rem;padding:6px;">'+(item.i||item.icon)+'<div style="font-size:0.6rem;">'+(item.n||item.name)+'</div></div>':'';}).join(''):'<span style="color:var(--text-light);">Wall vide</span>';let btn=document.getElementById('modal-friend-btn');if(u===currentUser){btn.style.display='none';}else{btn.style.display='block';let isFriend=(myState.friends||[]).includes(u);let isPending=friendRequests.find(r=>r.from===currentUser&&r.to===u&&r.status==='pending');btn.textContent=isFriend?'✅ Ami':(isPending?'⏳ En attente':'👥 Demande d\'ami');btn.style.background=isFriend?'var(--success)':'';}document.getElementById('profile-modal').classList.add('active');}
 function sendFriendRequest(){if(!selectedUser||selectedUser===currentUser)return;let isFriend=(myState.friends||[]).includes(selectedUser);if(isFriend){showToast('⚠️ Déjà ami !');return;}let already=friendRequests.find(r=>r.from===currentUser&&r.to===selectedUser&&r.status==='pending');if(already){showToast('⚠️ Déjà envoyé !');return;}friendRequests.push({from:currentUser,to:selectedUser,status:'pending',date:new Date().toISOString()});localStorage.setItem('receiptit_friend_requests',JSON.stringify(friendRequests));showToast('✅ Demande envoyée !');closeProfileModal();}
 function closeProfileModal(){document.getElementById('profile-modal').classList.remove('active');selectedUser=null;}
 function showToast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-document.addEventListener('DOMContentLoaded',async()=>{await loadMyState();loadAllUsers();document.getElementById('nav-points').textContent=myState.points;document.getElementById('wall-count').textContent='('+myState.stickerWall.length+')';renderAll();});
+document.addEventListener('DOMContentLoaded',async()=>{await loadMyState();await loadAllUsers();document.getElementById('nav-points').textContent=myState.points;document.getElementById('wall-count').textContent='('+myState.stickerWall.length+')';});
 document.getElementById('profile-modal').addEventListener('click',e=>{if(e.target.id==='profile-modal')closeProfileModal();});
 </script>
 </body>
