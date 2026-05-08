@@ -60,16 +60,16 @@ function populateSelects(){
     let friends=myState.friends||[];
     document.getElementById('trade-friend').innerHTML=friends.length?friends.map(f=>'<option value="'+f+'">@'+f+'</option>').join(''):'<option>Aucun ami</option>';
     let items=Object.entries(myState.inventory).map(([k,v])=>({key:k,...v}));
-    document.getElementById('trade-sticker').innerHTML=items.length?items.map(i=>'<option value="'+i.key.replace(/"/g,'&quot;')+'">'+i.i+' '+i.n+' (x'+i.count+')</option>').join(''):'<option>Pas de sticker</option>';
+    document.getElementById('trade-sticker').innerHTML=items.length?items.map(i=>'<option value="'+i.key.replace(/"/g,'&quot;')+'">'+(i.i||i.icon)+' '+(i.n||i.name)+' (x'+(i.count||1)+')</option>').join(''):'<option>Pas de sticker</option>';
 }
 
 function sendSticker(){
     let to=document.getElementById('trade-friend').value,key=document.getElementById('trade-sticker').value,msg=document.getElementById('trade-msg').value.trim();
     if(!to||to==='Aucun ami'){showToast('⚠️ Choisis un ami !');return;}
     if(!key||key==='Pas de sticker'){showToast('⚠️ Choisis un sticker !');return;}
-    let item=myState.inventory[key];if(!item||item.count<1){showToast('⚠️ Pas assez !');return;}
-    item.count--;if(item.count<=0)delete myState.inventory[key];
-    trades.push({id:Date.now(),from:currentUser,to,stickerKey:key,stickerName:item.n,stickerIcon:item.i,stickerRarity:item.rarity,message:msg||'🎁 Pour toi !',status:'pending',date:new Date().toISOString()});
+    let item=myState.inventory[key];if(!item||(item.count||0)<1){showToast('⚠️ Pas assez !');return;}
+    item.count=(item.count||1)-1;if(item.count<=0)delete myState.inventory[key];
+    trades.push({id:Date.now(),from:currentUser,to,stickerKey:key,stickerName:item.n||item.name,stickerIcon:item.i||item.icon,stickerRarity:item.rarity,message:msg||'🎁 Pour toi !',status:'pending',date:new Date().toISOString()});
     saveState();saveTrades();document.getElementById('trade-msg').value='';showToast('✅ Envoyé !');renderAll();populateSelects();
 }
 
