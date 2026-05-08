@@ -58,7 +58,13 @@
         <div class="modal-content"><span class="modal-icon" id="modal-icon">🎁</span><div class="modal-name" id="modal-name">Item</div><div class="modal-rarity" id="modal-rarity">Rarity</div><div class="modal-count" id="modal-count">x1</div><button class="modal-btn" onclick="closeModal()">OK</button></div>
     </div>
 
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL='https://fonraobtmkaallsjxtoj.supabase.co';
+const SUPABASE_KEY='sb_publishable_QxU-Ql1Mux18PlLjGady5g_gwkTCKSH';
+let supabase=null,supabaseOnline=false;
+(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);supabaseOnline=true}catch(e){supabaseOnline=false}})();
+
 const currentUser=localStorage.getItem('receiptit_logged_user');
 if(!currentUser)location.href='login.html';
 
@@ -69,7 +75,7 @@ const RN={common:'Commun',rare:'Rare',epic:'Épique',legendary:'Légendaire',div
 const RO={divine:5,legendary:4,epic:3,rare:2,common:1};
 
 async function loadData(){
-    if(typeof supabaseOnline!=='undefined'&&supabaseOnline){
+    if(supabaseOnline){
         try{let{data}=await supabase.from('receiptit_users').select('points,inventory').eq('username',currentUser).single();
         if(data){state.points=data.points||0;state.inventory=data.inventory||{};localStorage.setItem('receiptit_state_'+currentUser,JSON.stringify(state));return;}}catch(e){}
     }
