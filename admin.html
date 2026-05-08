@@ -10,10 +10,7 @@
 <body>
 <div class="bg-blob blob-1"></div><div class="bg-blob blob-2"></div><div class="bg-blob blob-3"></div>
 
-<nav class="navbar">
-    <div class="navbar-brand">RECEIPTIT ADMIN</div>
-    <button class="btn-small outline" onclick="logoutAdmin()" style="background:var(--danger-pale);border-color:var(--danger);color:var(--danger);">🚪 Quitter</button>
-</nav>
+<nav class="navbar"><div class="navbar-brand">RECEIPTIT ADMIN</div><button class="btn-small outline" onclick="logoutAdmin()" style="background:var(--danger-pale);border-color:var(--danger);color:var(--danger);">🚪 Quitter</button></nav>
 
 <div class="main-content-wide">
     <div class="admin-sidebar">
@@ -36,65 +33,53 @@
         </div>
     </div>
 
-    <div id="tab-users" style="display:none;">
-        <div class="card"><input type="text" id="user-search" placeholder="Rechercher..." style="width:100%;padding:10px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);font-family:'Outfit',sans-serif;margin-bottom:12px;" oninput="renderUsers()">
-        <div style="overflow-x:auto;"><table class="admin-table"><thead><tr><th>User</th><th>⭐</th><th>📚</th><th>🔥</th><th>🎁</th><th>👥</th><th>Act.</th></tr></thead><tbody id="users-tbody"></tbody></table></div></div>
-    </div>
+    <div id="tab-users" style="display:none;"><div class="card"><input type="text" id="user-search" placeholder="Rechercher..." style="width:100%;padding:10px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);font-family:'Outfit',sans-serif;margin-bottom:12px;" oninput="renderUsers()"><div style="overflow-x:auto;"><table class="admin-table"><thead><tr><th>User</th><th>⭐</th><th>📚</th><th>🔥</th><th>🎁</th><th>👥</th><th>Act.</th></tr></thead><tbody id="users-tbody"></tbody></table></div></div></div>
 
-    <div id="tab-packs" style="display:none;">
-        <div class="card"><h3>🎁 Packs custom</h3><div id="packs-admin-list"></div><button class="btn-primary" style="margin-top:12px;" onclick="document.getElementById('add-pack-form').style.display='block'">➕ Créer</button></div>
-        <div class="card" id="add-pack-form" style="display:none;"><h3>Nouveau pack</h3>
-            <div class="input-group"><label>Nom</label><input type="text" id="np-name" placeholder="Nom..."></div>
-            <div class="input-group"><label>Icône</label><input type="text" id="np-icon" value="🎁"></div>
-            <div class="input-group"><label>Coût</label><input type="number" id="np-cost" value="100"></div>
-            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px;">
-                <input type="number" id="np-common" value="70" placeholder="C%" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd;">
-                <input type="number" id="np-rare" value="20" placeholder="R%" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd;">
-                <input type="number" id="np-epic" value="9" placeholder="E%" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd;">
-                <input type="number" id="np-legendary" value="0.9" step="0.1" placeholder="L%" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd;">
-                <input type="number" id="np-divine" value="0.1" step="0.1" placeholder="D%" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd;">
-            </div>
-            <button class="btn-primary" onclick="addCustomPack()">✅ Créer</button>
-        </div>
-    </div>
+    <div id="tab-packs" style="display:none;"><div class="card"><h3>🎁 Packs custom</h3><div id="packs-admin-list"></div><button class="btn-primary" style="margin-top:12px;" onclick="document.getElementById('add-pack-form').style.display='block'">➕ Créer</button></div><div class="card" id="add-pack-form" style="display:none;"><h3>Nouveau pack</h3><div class="input-group"><label>Nom</label><input type="text" id="np-name" placeholder="Nom..."></div><div class="input-group"><label>Icône</label><input type="text" id="np-icon" value="🎁"></div><div class="input-group"><label>Coût</label><input type="number" id="np-cost" value="100"></div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px;"><input type="number" id="np-common" value="70" placeholder="C%" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd;"><input type="number" id="np-rare" value="20" placeholder="R%" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd;"><input type="number" id="np-epic" value="9" placeholder="E%" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd;"><input type="number" id="np-legendary" value="0.9" step="0.1" placeholder="L%" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd;"><input type="number" id="np-divine" value="0.1" step="0.1" placeholder="D%" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd;"></div><button class="btn-primary" onclick="addCustomPack()">✅ Créer</button></div></div>
 
-    <div id="tab-config" style="display:none;">
-        <div class="card"><h3>⚙️ Pomodoro</h3>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
-                <div class="input-group"><label>Focus 1</label><input type="number" id="cfg-f1" value="25"></div>
-                <div class="input-group"><label>Focus 2</label><input type="number" id="cfg-f2" value="15"></div>
-                <div class="input-group"><label>Pause courte</label><input type="number" id="cfg-sb" value="5"></div>
-                <div class="input-group"><label>Pause longue</label><input type="number" id="cfg-lb" value="15"></div>
-            </div>
-            <button class="btn-primary" onclick="saveConfig()">💾 Sauvegarder</button>
-        </div>
-    </div>
+    <div id="tab-config" style="display:none;"><div class="card"><h3>⚙️ Pomodoro</h3><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;"><div class="input-group"><label>Focus 1</label><input type="number" id="cfg-f1" value="25"></div><div class="input-group"><label>Focus 2</label><input type="number" id="cfg-f2" value="15"></div><div class="input-group"><label>Pause courte</label><input type="number" id="cfg-sb" value="5"></div><div class="input-group"><label>Pause longue</label><input type="number" id="cfg-lb" value="15"></div></div><button class="btn-primary" onclick="saveConfig()">💾 Sauvegarder</button></div></div>
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script>
+const SUPABASE_URL='https://fonraobtmkaallsjxtoj.supabase.co';
+const SUPABASE_KEY='sb_publishable_QxU-Ql1Mux18PlLjGady5g_gwkTCKSH';
+let supabase=null;
+(async function(){try{supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);console.log('✅ Supabase OK');}catch(e){console.error('❌ Supabase error:',e);}})();
+
 const ADMIN_PASSWORD='receiptit_admin_2024';
 if(!localStorage.getItem('receiptit_admin_logged')){let pw=prompt('🔐 Mot de passe admin :');if(pw!==ADMIN_PASSWORD){alert('❌ Refusé');location.href='index.html';}else localStorage.setItem('receiptit_admin_logged','true');}
 function logoutAdmin(){localStorage.removeItem('receiptit_admin_logged');location.href='index.html';}
 
+let allUsers=[];
+
+async function loadAllUsers(){try{let{data}=await supabase.from('receiptit_users').select('*');if(data){allUsers=data;return;}}catch(e){}allUsers=[];let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');Object.keys(users).forEach(u=>{let s=localStorage.getItem('receiptit_state_'+u);if(s)try{let st=JSON.parse(s);allUsers.push({username:u,...users[u],...st});}catch(e){}});}
+
 function switchTab(t){document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));document.querySelector('[onclick="switchTab(\''+t+'\')"]').classList.add('active');['dashboard','users','packs','config'].forEach(x=>document.getElementById('tab-'+x).style.display=x===t?'block':'none');if(t==='dashboard')loadDashboard();if(t==='users')renderUsers();if(t==='packs')renderPacks();}
 
-function getAllUsers(){let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');return Object.keys(users).map(u=>{let s=localStorage.getItem('receiptit_state_'+u);let st={};if(s)try{st=JSON.parse(s);}catch(e){}return{username:u,...users[u],...st};});}
+function loadDashboard(){
+    document.getElementById('dash-users').textContent=allUsers.length;
+    document.getElementById('dash-sessions').textContent=allUsers.reduce((s,u)=>s+(u.total_sessions||0),0);
+    document.getElementById('dash-packs').textContent=allUsers.reduce((s,u)=>s+(u.packs_opened||0),0);
+    document.getElementById('dash-points').textContent=allUsers.reduce((s,u)=>s+(u.points||0),0);
+    document.getElementById('dash-streak').textContent=allUsers.length?(allUsers.reduce((s,u)=>s+(u.streak||0),0)/allUsers.length).toFixed(1):'0';
+    let leg=0;allUsers.forEach(u=>{if(u.inventory)Object.values(u.inventory).forEach(i=>{if(i.rarity==='legendary'||i.rarity==='divine')leg+=i.count||1;});});
+    document.getElementById('dash-legendary').textContent=leg;
+}
 
-function loadDashboard(){let all=getAllUsers();document.getElementById('dash-users').textContent=all.length;document.getElementById('dash-sessions').textContent=all.reduce((s,u)=>s+(u.totalSessions||0),0);document.getElementById('dash-packs').textContent=all.reduce((s,u)=>s+(u.packsOpened||0),0);document.getElementById('dash-points').textContent=all.reduce((s,u)=>s+(u.points||0),0);document.getElementById('dash-streak').textContent=all.length?(all.reduce((s,u)=>s+(u.streak||0),0)/all.length).toFixed(1):'0';let leg=0;all.forEach(u=>{if(u.inventory)Object.values(u.inventory).forEach(i=>{if(i.rarity==='legendary'||i.rarity==='divine')leg+=i.count||1;});});document.getElementById('dash-legendary').textContent=leg;}
+function renderUsers(){let s=document.getElementById('user-search')?.value?.toLowerCase()||'';let filtered=allUsers.filter(u=>u.username.includes(s));document.getElementById('users-tbody').innerHTML=filtered.map(u=>'<tr><td><strong>@'+u.username+'</strong></td><td>⭐'+(u.points||0)+'</td><td>📚'+(u.total_sessions||0)+'</td><td>🔥'+(u.streak||0)+'j</td><td>🎁'+(u.packs_opened||0)+'</td><td>👥'+(u.friends?.length||0)+'</td><td><button class="btn-small outline" onclick="editPoints(\''+u.username+'\','+(u.points||0)+')">✏️</button><button class="btn-small outline" onclick="deleteUser(\''+u.username+'\')" style="border-color:var(--danger);color:var(--danger);">🗑️</button></td></tr>').join('');}
 
-function renderUsers(){let s=document.getElementById('user-search')?.value?.toLowerCase()||'';let all=getAllUsers().filter(u=>u.username.includes(s));document.getElementById('users-tbody').innerHTML=all.map(u=>'<tr><td><strong>@'+u.username+'</strong></td><td>⭐'+(u.points||0)+'</td><td>📚'+(u.totalSessions||0)+'</td><td>🔥'+(u.streak||0)+'j</td><td>🎁'+(u.packsOpened||0)+'</td><td>👥'+(u.friends?.length||0)+'</td><td><button class="btn-small outline" onclick="editPoints(\''+u.username+'\','+(u.points||0)+')">✏️</button><button class="btn-small outline" onclick="deleteUser(\''+u.username+'\')" style="border-color:var(--danger);color:var(--danger);">🗑️</button></td></tr>').join('');}
-function editPoints(u,pts){let np=prompt('Points pour @'+u,pts);if(!np)return;let s=JSON.parse(localStorage.getItem('receiptit_state_'+u)||'{}');s.points=parseInt(np);localStorage.setItem('receiptit_state_'+u,JSON.stringify(s));showToast('✅ @'+u+' → '+np);renderUsers();loadDashboard();}
-function deleteUser(u){if(!confirm('Supprimer @'+u+' ?'))return;let users=JSON.parse(localStorage.getItem('receiptit_users')||'{}');delete users[u];localStorage.setItem('receiptit_users',JSON.stringify(users));localStorage.removeItem('receiptit_state_'+u);showToast('🗑️ Supprimé');renderUsers();loadDashboard();}
+async function editPoints(u,pts){let np=prompt('Points pour @'+u,pts);if(!np)return;let p=parseInt(np);if(isNaN(p))return;try{await supabase.from('receiptit_users').update({points:p,updated_at:new Date().toISOString()}).eq('username',u);let user=allUsers.find(x=>x.username===u);if(user)user.points=p;}catch(e){}showToast('✅ @'+u+' → '+p);renderUsers();loadDashboard();}
+async function deleteUser(u){if(!confirm('Supprimer @'+u+' ?'))return;if(!confirm('Dernière confirmation ?'))return;try{await supabase.from('receiptit_users').delete().eq('username',u);allUsers=allUsers.filter(x=>x.username!==u);}catch(e){}showToast('🗑️ Supprimé');renderUsers();loadDashboard();}
 
-function renderPacks(){let packs=JSON.parse(localStorage.getItem('receiptit_custom_packs')||'[]');document.getElementById('packs-admin-list').innerHTML=packs.length?packs.map((p,i)=>'<div class="card" style="display:flex;justify-content:space-between;align-items:center;"><div><strong>'+p.icon+' '+p.name+'</strong> — ⭐'+p.cost+'<br><span style="font-size:0.7rem;">C:'+(p.probs?.common||0)+'% R:'+(p.probs?.rare||0)+'% E:'+(p.probs?.epic||0)+'% L:'+(p.probs?.legendary||0)+'% D:'+(p.probs?.divine||0)+'%</span></div><button class="btn-small outline" onclick="deletePack('+i+')" style="border-color:var(--danger);color:var(--danger);">🗑️</button></div>').join(''):'<p style="color:var(--text-dim);">Aucun pack custom.</p>';}
+function renderPacks(){let packs=JSON.parse(localStorage.getItem('receiptit_custom_packs')||'[]');document.getElementById('packs-admin-list').innerHTML=packs.length?packs.map((p,i)=>'<div class="card" style="display:flex;justify-content:space-between;align-items:center;"><div><strong>'+p.icon+' '+p.name+'</strong> — ⭐'+p.cost+'<br><span style="font-size:0.7rem;">C:'+(p.probs?.common||0)+'% R:'+(p.probs?.rare||0)+'% E:'+(p.probs?.epic||0)+'% L:'+(p.probs?.legendary||0)+'% D:'+(p.probs?.divine||0)+'%</span></div><button class="btn-small outline" onclick="deletePack('+i+')" style="border-color:var(--danger);color:var(--danger);">🗑️</button></div>').join(''):'<p style="color:var(--text-dim);">Aucun.</p>';}
 function addCustomPack(){let packs=JSON.parse(localStorage.getItem('receiptit_custom_packs')||'[]');packs.push({id:'custom_'+Date.now(),name:document.getElementById('np-name').value||'Pack',icon:document.getElementById('np-icon').value||'🎁',cost:parseInt(document.getElementById('np-cost').value)||100,probs:{common:parseFloat(document.getElementById('np-common').value)||0,rare:parseFloat(document.getElementById('np-rare').value)||0,epic:parseFloat(document.getElementById('np-epic').value)||0,legendary:parseFloat(document.getElementById('np-legendary').value)||0,divine:parseFloat(document.getElementById('np-divine').value)||0}});localStorage.setItem('receiptit_custom_packs',JSON.stringify(packs));document.getElementById('add-pack-form').style.display='none';renderPacks();showToast('✅ Créé !');}
 function deletePack(i){let packs=JSON.parse(localStorage.getItem('receiptit_custom_packs')||'[]');packs.splice(i,1);localStorage.setItem('receiptit_custom_packs',JSON.stringify(packs));renderPacks();}
-
 function saveConfig(){localStorage.setItem('receiptit_config',JSON.stringify({focus1:parseInt(document.getElementById('cfg-f1').value)||25,focus2:parseInt(document.getElementById('cfg-f2').value)||15,shortBreak:parseInt(document.getElementById('cfg-sb').value)||5,longBreak:parseInt(document.getElementById('cfg-lb').value)||15}));showToast('✅ Sauvegardé !');}
 function showToast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-document.addEventListener('DOMContentLoaded',()=>{loadDashboard();});
+document.addEventListener('DOMContentLoaded',async()=>{await loadAllUsers();loadDashboard();});
 </script>
 </body>
 </html>
